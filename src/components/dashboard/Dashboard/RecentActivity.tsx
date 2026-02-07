@@ -54,7 +54,7 @@ const RecentActivity = () => {
     return (
         <div className="p-5">
             <Card className="border-0">
-                <CardHeader className="pb-6">
+                <CardHeader className="pb-0!">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div>
                             <h3 className="text-2xl font-semibold mb-1">Recent Activity</h3>
@@ -64,8 +64,8 @@ const RecentActivity = () => {
                 </CardHeader>
                 <CardContent className="p-0">
                     <Table>
-                        <TableHeader>
-                            <TableRow className="bg-gray-50 border-b">
+                        <TableHeader >
+                            <TableRow className="bg-gray-100 border-b">
                                 <TableHead className="text-gray-600 font-semibold uppercase text-xs pl-10 w-[60%]">Activity</TableHead>
                                 <TableHead className="text-gray-600 font-semibold uppercase text-xs w-[40%] text-right pr-10">Time</TableHead>
                             </TableRow>

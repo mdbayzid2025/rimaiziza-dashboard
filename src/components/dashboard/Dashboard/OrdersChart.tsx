@@ -63,7 +63,7 @@ export function OrdersChart({ mode = "light" }: OrdersChartProps) {
           axisLine={false}
           tickLine={false}
           tick={{ fill: colors.gray[600], fontSize: 13 }}
-          tickFormatter={(value) => (value % 10 === 0 ? value.toString() : "")}
+          tickFormatter={(value: any) => (value % 10 === 0 ? `$${value}` : "")}
           dx={-10}
         />
         <Tooltip

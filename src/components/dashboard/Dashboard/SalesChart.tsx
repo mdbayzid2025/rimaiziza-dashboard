@@ -37,11 +37,11 @@ export function SalesChart({ dataType = "data1", mode = "light" }: SalesChartPro
     const gridColor = getGridColor(mode);
 
     return (
-        <div className="bg-slate-900 pb-5 rounded-lg w-full shadow-xl" data-aos="fade-up-right" data-aos-delay={500}>
+        <div className="bg-white  pb-5 rounded-lg w-full shadow-xl" data-aos="fade-up-right" data-aos-delay={500}>
             <div className="flex items-center justify-between border-b border-slate-500 mb-5 py-3">
                 <div className="pl-4">
                     <span className="text-sm uppercase text-slate-400 font-semibold">Overview</span>
-                    <p className="text-xl font-semibold text-white">Sales Value</p>
+                    <p className="text-xl font-semibold text-slate-800">Sales Value</p>
                 </div>
                 <div className="pr-5">
                 <Select value={currentYear?.toString()}>
@@ -105,7 +105,7 @@ export function SalesChart({ dataType = "data1", mode = "light" }: SalesChartPro
                     <Line
                         type="monotone"
                         dataKey="value"
-                        stroke={colors.theme.primary}
+                        stroke="#fb2c36"                        
                         strokeWidth={4}
                         dot={false}
                         activeDot={{ r: 6, fill: colors.theme.primary }}

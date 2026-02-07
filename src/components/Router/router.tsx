@@ -5,6 +5,12 @@ import Dashboard from "../dashboard/Dashboard/Dashboard";
 import Users from "../dashboard/Users/Users";
 import AllVehicles from "../dashboard/Vehicles/Vehicles";
 import Hosts from "../dashboard/Hosts/Hosts";
+import Bookings from "../dashboard/Booking/Bookings";
+import Settings from "../dashboard/Setting/Setting";
+import Login from "../auth/Login";
+import ForgotPassword from "../auth/ForgotPassword";
+import OTPVerifyPage from "../auth/OTPVerifyPage";
+import NewPassword from "../auth/NewPassword";
 
 const router = createBrowserRouter([
     {
@@ -28,8 +34,20 @@ const router = createBrowserRouter([
                 path: "hosts",
                 element: <Hosts />
             },
+            {
+                path: "bookings",
+                element: <Bookings />
+            },
+            {
+                path: "setting",
+                element: <Settings />
+            },
         ]
-    }
+    },
+    { path: "/login", element: <Login /> },
+    { path: "/forgot-password", element: <ForgotPassword /> },
+    { path: "/otp-verify", element: <OTPVerifyPage /> },
+    { path: "/new-password", element: <NewPassword /> },
 ])
 
 export default router;
