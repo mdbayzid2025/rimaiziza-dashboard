@@ -36,18 +36,16 @@ export default function Login() {
             Cookies.set("password", password);
         }
 
-
-
         try {
             const response = await login({ email, password })?.unwrap();
-            console.log("response", response);
+            
             if (response?.success) {
                 toast.success(response?.message);
                 Cookies.set("accessToken", response?.data?.token);
                 navigate("/")
             }
-        } catch (error) {
-
+        } catch (error:any) {
+            toast.success(error?.message);
         }
     }
 
@@ -67,7 +65,7 @@ export default function Login() {
                     <form onSubmit={handleLogin} className="space-y-5">
                         {/* Email */}
                         <div className="space-y-1">
-                            <Label>Email</Label>
+                            <Label className="mb-2">Email</Label>
                             <Input
                                 type="email"
                                 placeholder="enter email..."
@@ -80,7 +78,7 @@ export default function Login() {
 
                         {/* Password */}
                         <div className="space-y-1">
-                            <Label>Password</Label>
+                            <Label className="mb-2">Password</Label>
                             <Input
                                 type="password"
                                 placeholder="enter password..."

@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
+import { useState } from 'react';
 
-import { Card, CardContent } from '../../ui/card';
+import { FileText, Loader2, Save } from 'lucide-react';
 import { Badge } from '../../ui/badge';
 import { Button } from '../../ui/button';
-import { FileText, Loader2, Save } from 'lucide-react';
+import { Card, CardContent } from '../../ui/card';
 import { Textarea } from '../../ui/textarea';
 
 // Terms & Conditions State

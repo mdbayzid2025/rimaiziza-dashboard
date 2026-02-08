@@ -5,11 +5,8 @@ import Cookies from "js-cookie";
 export const baseApi = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
- 
-    baseUrl: "http://10.10.7.48:5000/api/v1",    
-    // baseUrl: "https://rakibur5000.binarybards.online/api/v1",    
 
-    // baseUrl: "https://api.wesound.app/api/v1",    
+    baseUrl: "http://10.10.7.41:5005/api/v1",   
     prepareHeaders: (headers) => {      
       const token = Cookies.get("accessToken");
       if (token) {
@@ -18,12 +15,10 @@ export const baseApi = createApi({
       return headers;
     },
     credentials: "include",
+
   }),
   endpoints: () => ({}),
   tagTypes: ["user", "notifications", "admin", "category", "slider", "faqs", "withdrawal", "planner"],
 });
 
-// export const imageUrl = "https://api.wesound.app";
-
-export const imageUrl = "http://10.10.7.48:5000";
-// export const imageUrl = "https://rakibur5000.binarybards.online";
+export const imageUrl = "http://10.10.7.41:5005";

@@ -1,4 +1,4 @@
-import { Calendar, Car, UserCheck } from "lucide-react";
+import { Calendar, Car, UserCheck, UserStar } from "lucide-react";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { IoSettingsOutline } from "react-icons/io5";
 import { RxDashboard } from "react-icons/rx";
@@ -10,17 +10,12 @@ export const sidebarItems = [
     path: "",
     icon: <RxDashboard size={20} />,
   },
-  {
-    key: "users",
-    label: "Users Manage",
-    path: "users",
-    icon: <FaRegCircleUser size={20} />,
-  },
+
   {
     key: "vehicles",
     label: "Vehicles Manage",
     path: "vehicles",
-    icon: <Car  size={20} />,
+    icon: <Car size={20} />,
   },
   {
     key: "hosts",
@@ -34,7 +29,18 @@ export const sidebarItems = [
     path: "bookings",
     icon: <Calendar size={20} />,
   },
-  
+  {
+    key: "users",
+    label: "Users Manage",
+    path: "users",
+    icon: <FaRegCircleUser size={20} />,
+  },
+  {
+    key: "admins",
+    label: "Admin Manage",
+    path: "admins",
+    icon: <UserStar size={20} />,
+  },
   {
     key: "setting",
     label: "Setting",

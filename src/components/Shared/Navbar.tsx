@@ -1,5 +1,5 @@
 import { Bell } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import {
@@ -10,18 +10,29 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "../ui/dropdown-menu";
+import Cookies from "js-cookie";
+
 
 
 const Navbar = () => {
+
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    Cookies.remove("accessToken");
+    Cookies.remove("email");
+    Cookies.remove("password");
+    navigate("/login");
+  };
+
   return (
     <nav className=" bg-gradient-info shadow-lg w-full">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-end gap-2">
 
-          
+
           <div className="relative p-2 bg-white rounded-md">
-          <Bell className="text-secondary" size={22} />
-          <div className="absolute -top-1 -right-1 shadow-lg w-5 h-5 rounded-full bg-secondary text-white flex items-center justify-center">0</div>
+            <Bell className="text-secondary" size={22} />
+            <div className="absolute -top-1 -right-1 shadow-lg w-5 h-5 rounded-full bg-secondary text-white flex items-center justify-center">0</div>
           </div>
           {/* User Menu */}
           <div className="hidden md:flex border-l-2 border-slate-200 pl-0.5">
@@ -106,11 +117,7 @@ const Navbar = () => {
 
                 <DropdownMenuItem
                   className="cursor-pointer text-white! bg-red-600!  "
-                  onClick={(e) => {
-                    e.preventDefault();
-                    // Handle logout
-                  }}
-                >
+                  onClick={() => handleLogout()}>
                   <svg
                     className="mr-2 h-4 w-4"
                     fill="none"

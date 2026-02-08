@@ -31,7 +31,7 @@ const userApi = baseApi.injectEndpoints({
     }),
     
     getAdmin: build.query({
-        query: ()=> `/admins/get-admin${location.search}`,
+        query: ()=> `/users/admins${location.search}`,
         providesTags: ['admin'],
         transformResponse: (response: {data: any})=> response.data,
     }),

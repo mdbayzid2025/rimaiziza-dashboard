@@ -11,21 +11,21 @@ import Login from "../auth/Login";
 import ForgotPassword from "../auth/ForgotPassword";
 import OTPVerifyPage from "../auth/OTPVerifyPage";
 import NewPassword from "../auth/NewPassword";
+import PrivateRoute from "./PrivateRouter";
+import AdminManage from "../dashboard/Admin/Admins";
 
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <MainLayout />,
+        element: <PrivateRoute> <MainLayout /></PrivateRoute>,
+        // element: <MainLayout />,
         errorElement: <ErrorPage />,
         children: [
             {
                 path: "",
                 element: <Dashboard />
             },
-            {
-                path: "users",
-                element: <Users />
-            },
+          
             {
                 path: "vehicles",
                 element: <AllVehicles />
@@ -33,6 +33,14 @@ const router = createBrowserRouter([
             {
                 path: "hosts",
                 element: <Hosts />
+            },
+              {
+                path: "users",
+                element: <Users />
+            },
+            {
+                path: "admins",
+                element: <AdminManage />
             },
             {
                 path: "bookings",

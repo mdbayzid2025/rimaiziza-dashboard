@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
-import { Card, CardContent } from '../../ui/card';
 import { Badge, FileText, Loader2, Save } from 'lucide-react';
+import { useState } from 'react';
 import { Button } from '../../ui/button';
+import { Card, CardContent } from '../../ui/card';
 import { Textarea } from '../../ui/textarea';
 
 const initData = {

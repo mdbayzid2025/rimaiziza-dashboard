@@ -12,11 +12,11 @@ import PrivacyPolicy from "./PrivacyPolicy";
 import TermsCondition from "./TermsCondition";
 
 const TABS = [
-    { value: "general", label: "Personal Information", icon: Globe, animate :"fade-up", delay: 100 },
-    { value: "pricing", label: "Pricing & Fees", icon: DollarSign, animate :"fade-down", delay: 200 },
-    { value: "security", label: "Security", icon: Shield, animate :"fade-up", delay: 300 },
-    { value: "terms", label: "Term and Condition", icon: FileText, animate :"fade-down", delay: 400 },
-    { value: "privacy", label: "Privacy Policy", icon: FileText, animate :"fade-up", delay: 500 },
+    { value: "general", label: "Personal Information", icon: Globe, animate: "fade-up-right", delay: 100 },
+    { value: "pricing", label: "Pricing & Fees", icon: DollarSign, animate: "fade-up-right", delay: 200 },
+    { value: "security", label: "Security", icon: Shield, animate: "fade-up-right", delay: 300 },
+    { value: "terms", label: "Term and Condition", icon: FileText, animate: "fade-up-right", delay: 400 },
+    { value: "privacy", label: "Privacy Policy", icon: FileText, animate: "fade-up-right", delay: 500 },
 ];
 
 export default function Setting() {
@@ -38,8 +38,13 @@ export default function Setting() {
         <div className="p-5">
             <Tabs defaultValue="general" className="w-full">
                 <div className="bg-white rounded-2xl p-4 mb-6 shadow-sm border">
-                    <h1 className="text-2xl! font-bold py-3! text-center uppercase">Admin Settings</h1>                    
-                    <TabsList className="grid w-full h-16! bg-primary/20 grid-cols-5 gap-5 p-2">
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900">Setting</h2>
+                        <p className="text-sm text-gray-600 mt-1">
+                            Manage application settings and administrative preferences.
+                        </p>
+                    </div>
+                    <TabsList className="grid w-full h-16! bg-primary/20 grid-cols-5 gap-5 p-2 mt-5">
                         {TABS.map(({ value, label, icon: Icon, animate, delay }) => (
                             <TabsTrigger
                                 key={value}
