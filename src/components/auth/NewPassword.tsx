@@ -28,7 +28,7 @@ const NewPassword = () => {
 
   return (
     <div className="flex flex-col w-screen items-center justify-center min-h-screen bg-gray-100 p-4">
-      <Card className="w-[90%] mx-auto md:w-full max-w-xl p-0 sm:p-10">
+      <Card className="w-[90%] mx-auto md:w-full max-w-xl p-0 sm:p-10" data-aos="zoom-in">
         <CardHeader className="flex flex-col items-center space-y-3">
           <img
             src="/logo.png"
@@ -80,8 +80,7 @@ const NewPassword = () => {
 
           <Button
             onClick={handleSubmit}
-            className="w-full mx-auto bg-green-800! text-white px-6 py-2 rounded mb-4 hover:bg-green-600 font-semibold"
-          >
+            className="w-full mx-auto  px-6 py-2 rounded mb-4  font-semibold">
             Submit
           </Button>
         </CardContent>

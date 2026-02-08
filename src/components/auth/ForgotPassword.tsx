@@ -7,7 +7,7 @@ import { Link } from "react-router-dom"
 export default function ForgotPassword() {
   return (
     <div className="min-h-screen  w-screen  flex items-center justify-center bg-gradient-to-br from-[#f7f8fc] to-[#eef2ff] px-4">
-      <Card className="w-full max-w-md rounded-2xl shadow-lg">
+      <Card className="w-full max-w-md rounded-2xl shadow-lg" data-aos="zoom-in">
         <CardHeader className="text-center space-y-2">
           <div className="flex justify-center">
             <img src="/logo.png" className='w-full  max-w-20 h-14 object-cover overflow-visible scale-70' alt="Logo" />

@@ -44,7 +44,7 @@ export default function HostDetailsModal({ open, onClose, host }: HostDetailsMod
     }
 
     console.log("host", host?.vehicles?.length);
-    
+
 
     const getStatusColor = (status: string) => {
         switch (status?.toLowerCase()) {
@@ -80,11 +80,17 @@ export default function HostDetailsModal({ open, onClose, host }: HostDetailsMod
                             data-[state=active]:bg-primary!
                             data-[state=active]:text-white!
                             data-[state=active]:shadow-md!
+                            data-[state=active]:hover:border-none!
+                                    data-[state=active]:focus:outline-none!
+                                    data-[state=active]:focus-visible::outline-none! 
                             transition-all" value="information">Information</TabsTrigger>
                             <TabsTrigger className=" bg-gray-300! text-gray-600
                             data-[state=active]:bg-primary!
                             data-[state=active]:text-white!
                             data-[state=active]:shadow-md!
+                            data-[state=active]:hover:border-none!
+                                    data-[state=active]:focus:outline-none!
+                                    data-[state=active]:focus-visible::outline-none! 
                             transition-all" value="vehicles">Assigned Vehicles</TabsTrigger>
                         </TabsList>
                     </div>

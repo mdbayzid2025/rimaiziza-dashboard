@@ -69,7 +69,7 @@ export default function Sidebar() {
             variant="ghost"
             size="icon"
             className="h-8 w-8"
-            onClick={() => setCollapsed(!collapsed)}
+            // onClick={() => setCollapsed(!collapsed)}
           >
             {collapsed ? (
               <FiChevronRight className="h-4 w-4" />

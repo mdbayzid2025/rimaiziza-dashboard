@@ -126,7 +126,7 @@ const OTPVerifyPage = () => {
 
     return (
         <div className="flex flex-col w-screen items-center justify-center min-h-screen bg-gray-100 p-4">
-            <Card className="w-[90%] mx-auto md:w-full max-w-xl p-0 sm:p-10">
+            <Card className="w-[90%] mx-auto md:w-full max-w-xl p-0 sm:p-10" data-aos="zoom-in">
                 {/* Card Header */}
                 <CardHeader className="flex flex-col items-center space-y-3">
                     <img src="/logo.png" className='w-full  max-w-20 h-14 object-cover overflow-visible scale-70' alt="Logo" />
@@ -157,7 +157,7 @@ const OTPVerifyPage = () => {
                     <Button
                         onClick={handleVerify}
                         disabled={secondsLeft <= 0}
-                        className="w-full mx-auto bg-green-800! text-white px-6 py-2 rounded mb-4 hover:bg-green-600 font-semibold"
+                        className="w-full mx-auto  px-6 py-2 rounded mb-4  font-semibold"
                     >
                         Verify OTP
                     </Button>
@@ -170,9 +170,11 @@ const OTPVerifyPage = () => {
                     </p>
 
                     <Button
+                    variant="outline"
                         onClick={handleResendOtp}
                         disabled={secondsLeft > 0}
-                        className={`w-full mx-auto px-4 py-2 rounded font-semibold ${secondsLeft > 0 ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+                        className={`w-full mx-auto px-4 py-2 rounded font-semibold ${secondsLeft > 0 ? 'bg-gray-300! text-gray-500! cursor-not-allowed' 
+                            : 'border-gray-500! border-2! hover:bg-gray-200! transition-all! duration-300!'}`}
                     >
                         Resend OTP
                     </Button>
