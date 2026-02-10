@@ -17,12 +17,15 @@ import { useState } from 'react';
 import AddCarForm from './AddCarForm';
 import { useGetCarsQuery } from '../../../redux/features/cars/carsApi';
 import { imageUrl } from '../../../redux/base/baseAPI';
+import CarDetailsModal from './CarDetailsModal';
 
 export default function AllCars() {
   ;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState<any>(null);
+  const [open, setOpen] = useState<any>(null);
+  
 
   const { data: carsData } = useGetCarsQuery({});
   return (
@@ -140,7 +143,7 @@ export default function AllCars() {
 
                   <TableCell>
                     <div className="flex items-center justify-center gap-3">
-                      <button className="text-muted-foreground hover:text-foreground transition-colors">
+                      <button onClick={()=>{setSelectedCar(car); setOpen(true)}} className="text-muted-foreground hover:text-foreground transition-colors">
                         <Eye className="h-4 w-4" />
                       </button>
                       <button onClick={() => { setSelectedCar(car) }} className="text-muted-foreground hover:text-foreground transition-colors">
@@ -157,6 +160,7 @@ export default function AllCars() {
           </Table>
         </CardContent>
       </Card>
+      <CarDetailsModal open={open} onClose={()=>setOpen(false)} car={selectedCar} />
     </div>
   );
 }
