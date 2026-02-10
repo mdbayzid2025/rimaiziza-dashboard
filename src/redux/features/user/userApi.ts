@@ -22,7 +22,7 @@ const userApi = baseApi.injectEndpoints({
     createAdmin: build.mutation({
       query: (data)=>{
         return {
-          url: "/admins/create-admin",
+          url: "/users/create-admin",
           method: "POST",
           body: data
         }
@@ -36,7 +36,7 @@ const userApi = baseApi.injectEndpoints({
         transformResponse: (response: {data: any})=> response.data,
     }),
     deleteAdmin: build.mutation({
-        query: (id)=> {return {url: `/admins/${id}`, method: "DELETE"}},
+        query: (id)=> {return {url: `/users/admins/${id}`, method: "DELETE"}},
         invalidatesTags: ['admin'],
         
     }),

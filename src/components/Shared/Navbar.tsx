@@ -18,9 +18,7 @@ const Navbar = () => {
 
   const navigate = useNavigate();
   const handleLogout = () => {
-    Cookies.remove("accessToken");
-    Cookies.remove("email");
-    Cookies.remove("password");
+    Cookies.remove("accessToken");    
     navigate("/login");
   };
 

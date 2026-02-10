@@ -12,9 +12,9 @@ export const sidebarItems = [
   },
 
   {
-    key: "vehicles",
-    label: "Vehicles Manage",
-    path: "vehicles",
+    key: "cars",
+    label: "Cars Manage",
+    path: "cars",
     icon: <Car size={20} />,
   },
   {

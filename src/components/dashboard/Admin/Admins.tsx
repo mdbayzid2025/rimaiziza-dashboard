@@ -1,5 +1,9 @@
-import { Edit, Lock, Mail, Search, Trash2, Unlock, UserPlus } from 'lucide-react';
+import { Mail, Trash2, UserPlus } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
+import Swal from 'sweetalert2';
+import { useCreateAdminMutation, useDeleteAdminMutation, useGetAdminQuery } from '../../../redux/features/user/userApi';
+import { confirmDelete } from '../../Shared/confirmDelete';
 import { Badge } from '../../ui/badge';
 import { Button } from '../../ui/button';
 import { Card, CardContent, CardHeader } from '../../ui/card';
@@ -10,15 +14,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '../../ui/dialog';
-import { Input } from '../../ui/input';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '../../ui/table';
 import {
     Pagination,
     PaginationContent,
@@ -27,22 +22,26 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from '../../ui/pagination';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '../../ui/table';
 import AddAdminForm from './AddAdminForm';
-import { useGetAdminQuery } from '../../../redux/features/user/userApi';
-
 
 
 
 export default function AdminManage({ totalPages = 5 }: any) {
-    const [searchQuery, setSearchQuery] = useState('');
+    
     const [currentPage, setCurrentPage] = useState(1);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const itemsPerPage = 6;
 
-    const { data: adminsData } = useGetAdminQuery({});
-
-    console.log("adminsData", adminsData);
-
+    const { data: adminsData, refetch } = useGetAdminQuery({});
+    const [addAdmin] = useCreateAdminMutation()
+    const [deleteAdmin] = useDeleteAdminMutation()
 
     const handlePageChange = (page: number) => {
         if (page < 1 || page > totalPages) return;
@@ -57,63 +56,7 @@ export default function AdminManage({ totalPages = 5 }: any) {
         return pages;
     };
 
-    // Sample admin data
-    const admins = [
-        {
-            id: 1,
-            name: 'John Doe',
-            email: 'john.doe@admin.com',
-            role: 'ADMIN',
-            status: 'Active',
-            joinDate: '2024-01-15',
-            lastLogin: '2024-02-08 10:30 AM',
-        },
-        {
-            id: 2,
-            name: 'Sarah Johnson',
-            email: 'sarah.j@admin.com',
-            role: 'ADMIN',
-            status: 'Active',
-            joinDate: '2023-11-20',
-            lastLogin: '2024-02-08 09:15 AM',
-        },
-        {
-            id: 3,
-            name: 'Michael Chen',
-            email: 'michael.c@admin.com',
-            role: 'ADMIN',
-            status: 'Inactive',
-            joinDate: '2023-08-10',
-            lastLogin: '2024-01-25 03:45 PM',
-        },
-        {
-            id: 4,
-            name: 'Emily Rodriguez',
-            email: 'emily.r@admin.com',
-            role: 'ADMIN',
-            status: 'Active',
-            joinDate: '2024-01-05',
-            lastLogin: '2024-02-07 04:20 PM',
-        },
-        {
-            id: 5,
-            name: 'David Kim',
-            email: 'david.k@admin.com',
-            role: 'ADMIN',
-            status: 'Active',
-            joinDate: '2023-12-12',
-            lastLogin: '2024-02-08 08:00 AM',
-        },
-        {
-            id: 6,
-            name: 'Lisa Anderson',
-            email: 'lisa.a@admin.com',
-            role: 'ADMIN',
-            status: 'Pending',
-            joinDate: '2024-02-05',
-            lastLogin: 'Never',
-        },
-    ];
+    
 
     const getStatusBadge = (status: any) => {
         const variants = {
@@ -124,31 +67,62 @@ export default function AdminManage({ totalPages = 5 }: any) {
         return variants[status as keyof typeof variants] || 'bg-gray-100 text-gray-800';
     };
 
-    const filteredAdmins = admins.filter(
-        (admin) =>
-            admin.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            admin.email.toLowerCase().includes(searchQuery.toLowerCase())
-    );
 
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const currentAdmins = filteredAdmins.slice(startIndex, endIndex);
 
-    const handleFormSubmit = (formData: FormData) => {
+
+    const handleFormSubmit = async (formData: FormData) => {
         const data = Object.fromEntries(formData);
 
         const payload = {
             name: data.name,
             email: data.email,
             password: data.password,
-            role: 'ADMIN', // Always ADMIN
+            role: 'ADMIN',
         };
 
-        console.log('Admin Creation Payload:', payload);
-        console.log('JSON Format:', JSON.stringify(payload, null, 2));
-        setIsModalOpen(false);
+        try {
+            const response = await addAdmin(payload)?.unwrap();
+
+            if (response?.success) {
+                toast?.success(response?.message);
+                refetch();
+                setIsModalOpen(false);
+            }
+
+        } catch (error: any) {
+            toast?.error(error?.data?.message);
+            setIsModalOpen(false);
+        }
+
     };
 
+    const handleAdminDelete = async (adminId: string) => {
+        const isConfirmed = await confirmDelete({
+            title: "Delete Admin?",
+            text: "This admin account will be permanently removed.",
+        });
+
+        if (!isConfirmed) return;
+
+        try {
+            // 🔴 Call your API here
+            await deleteAdmin(adminId);
+
+            Swal.fire({
+                icon: "success",
+                title: "Deleted!",
+                text: "Admin has been deleted successfully.",
+                timer: 1500,
+                showConfirmButton: false,
+            });
+        } catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Failed!",
+                text: "Something went wrong while deleting.",
+            });
+        }
+    };
     return (
         <div className="p-5">
             <Card className="w-full border-none shadow-lg gap-0">
@@ -160,17 +134,7 @@ export default function AdminManage({ totalPages = 5 }: any) {
                                 Manage and monitor administrator accounts
                             </p>
                         </div>
-                        <div className="flex items-center gap-3">
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                                <Input
-                                    type="text"
-                                    placeholder="Search admins..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="pl-10 w-64"
-                                />
-                            </div>
+                        <div className="flex items-center gap-3">                            
                             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                                 <DialogTrigger asChild>
                                     <Button className="bg-purple-600 hover:bg-purple-700">
@@ -180,7 +144,7 @@ export default function AdminManage({ totalPages = 5 }: any) {
                                 </DialogTrigger>
                                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                                     <DialogHeader>
-                                        <DialogTitle className="text-2xl">Add New Administrator</DialogTitle>
+                                        <DialogTitle className="text-2xl">Add Admin</DialogTitle>
                                     </DialogHeader>
                                     <AddAdminForm
                                         onSubmit={handleFormSubmit}
@@ -231,31 +195,13 @@ export default function AdminManage({ totalPages = 5 }: any) {
                                         </TableCell>
                                         <TableCell>
                                             <Badge className={getStatusBadge(admin.status)}>{admin.status}</Badge>
-                                        </TableCell>                                        
+                                        </TableCell>
                                         <TableCell>
-                                            <div className="flex items-center justify-end gap-2 pr-5">
+                                            <div className="flex items-center justify-end gap-2 pr-5">                                                
                                                 <Button
-                                                    variant="ghost"
+                                                onClick={()=>handleAdminDelete(admin?._id)}                                                    
                                                     size="sm"
-                                                    className="hover:bg-blue-50 hover:text-blue-600"
-                                                >
-                                                    <Edit size={16} />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="hover:bg-amber-50 hover:text-amber-600"
-                                                >
-                                                    {admin?.status?.toLowerCase() === 'active' ? (
-                                                        <Lock size={16} />
-                                                    ) : (
-                                                        <Unlock size={16} />
-                                                    )}
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="hover:bg-red-50 hover:text-red-600"
+                                                    className="bg-red-600!"
                                                 >
                                                     <Trash2 size={16} />
                                                 </Button>
@@ -266,13 +212,7 @@ export default function AdminManage({ totalPages = 5 }: any) {
                                     <p className="text-lg">No admins found matching your search.</p>
                                 </div>}
                             </TableBody>
-                        </Table>
-
-                        {filteredAdmins.length === 0 && (
-                            <div className="text-center py-12 text-gray-500">
-                                <p className="text-lg">No admins found matching your search.</p>
-                            </div>
-                        )}
+                        </Table>                        
                     </div>
 
                     {/* Pagination */}

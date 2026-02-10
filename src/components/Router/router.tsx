@@ -3,7 +3,7 @@ import MainLayout from "../Layout/MainLayout";
 import ErrorPage from "../Shared/ErrorPage";
 import Dashboard from "../dashboard/Dashboard/Dashboard";
 import Users from "../dashboard/Users/Users";
-import AllVehicles from "../dashboard/Vehicles/Vehicles";
+import AllCars from "../dashboard/Cars/AllCars";
 import Hosts from "../dashboard/Hosts/Hosts";
 import Bookings from "../dashboard/Booking/Bookings";
 import Settings from "../dashboard/Setting/Setting";
@@ -27,8 +27,8 @@ const router = createBrowserRouter([
             },
           
             {
-                path: "vehicles",
-                element: <AllVehicles />
+                path: "cars",
+                element: <AllCars />
             },
             {
                 path: "hosts",

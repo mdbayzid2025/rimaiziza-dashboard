@@ -1,6 +1,6 @@
 
 import { Loader2, Save, User, X } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { cn } from '../../../lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
@@ -8,25 +8,30 @@ import { Button } from '../../ui/button';
 import { Card, CardContent } from '../../ui/card';
 import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
+import { useEditProfileMutation, useGetProfileQuery } from '../../../redux/features/user/userApi';
+import { toast } from 'sonner';
+
 
 const PersonalInformation = () => {
   const [loading, setLoading] = useState(false);
 
-  const [generalSettings, setGeneralSettings] = useState({
-    name: "Samuel Johnson",
-    supportEmail: "support@courierexpress.com",
-    supportPhone: "+1 (800) 123-4567",
-    address: "",
-  });
+  const [formData, setFormData] = useState({ name: "", email: "" });
 
   // Profile photo states
   const [profilePreview, setProfilePreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [existingProfileUrl] = useState<string | null>(
-    
-  );
+  const [existingProfileUrl, setExistingProfileUrl] = useState<string | null>(null);
 
-  // ── react-dropzone configuration ───────────────────────────────
+  const { data: profileData } = useGetProfileQuery({});
+  const [editProfile] = useEditProfileMutation()
+  
+
+  useEffect(() => {
+    setFormData({ name: profileData?.name, email: profileData?.email });
+    setExistingProfileUrl(profileData?.profileImage)
+  }, [profileData])
+
+  // ────────────── react-dropzone configuration ───────────────────────────────
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
       'image/jpeg': ['.jpg', '.jpeg'],
@@ -39,32 +44,20 @@ const PersonalInformation = () => {
       const file = acceptedFiles[0];
       if (!file) return;
 
-      setSelectedFile(file);
 
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onload = () => {
         setProfilePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
     },
-    onDropRejected: (fileRejections) => {
-      if (fileRejections.length > 0) {
-        const error = fileRejections[0].errors[0];
-        if (error.code === 'file-too-large') {
-          alert('File is too large. Maximum size is 5MB.');
-        } else if (error.code === 'file-invalid-type') {
-          alert('Only JPG, PNG and WebP images are allowed.');
-        } else {
-          alert('File rejected: ' + error.message);
-        }
-      }
-    },
   });
 
   const displayImage = profilePreview || existingProfileUrl;
 
   const handleRemoveImage = (e: React.MouseEvent) => {
-    e.stopPropagation(); // prevent triggering dropzone click
+    e.stopPropagation();
     setProfilePreview(null);
     setSelectedFile(null);
   };
@@ -73,34 +66,21 @@ const PersonalInformation = () => {
     setLoading(true);
 
     try {
-      // ── Prepare data to send ───────────────────────────────
-      console.log('General settings:', generalSettings);
+      const payload = new FormData();
 
       if (selectedFile) {
-        console.log('New profile photo selected → should be uploaded');
-        // In real app:
-        // const formData = new FormData();
-        // formData.append('profilePhoto', selectedFile);
-        // formData.append('name', generalSettings.name);
-        // ... axios.post('/api/profile', formData)
-      } else {
-        console.log('No new photo selected');
+        payload.append("profileImage", selectedFile)
+      }
+      payload.append("data", JSON.stringify(formData));
+
+      const response = await editProfile(payload)?.unwrap();
+
+      if (response?.success) {
+        toast.success(response?.message)
       }
 
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1400));
-
-      // After successful save you might:
-      // setExistingProfileUrl(newUrlFromServer);
-      // setProfilePreview(null);
-      // setSelectedFile(null);
-
-      alert('Settings saved successfully! (mock save)');
-    } catch (err) {
-      console.error('Save failed:', err);
-      alert('Failed to save changes. Please try again.');
-    } finally {
-      setLoading(false);
+    } catch (err: any) {
+      toast?.error(err?.data?.message)
     }
   };
 
@@ -109,7 +89,7 @@ const PersonalInformation = () => {
       <CardContent className="px-6 sm:px-8 py-8 ">
         <div className="flex gap-10 lg:gap-12">
           {/* ── Profile Photo Section ── */}
-          <div className="flex flex-col items-center md:items-start gap-6 order-1 md:order-none">
+          <div className="flex flex-col items-center md:items-start gap-6 order-1 md:order-0">
             <h2 className="text-2xl font-bold md:hidden mb-2">Profile Photo</h2>
 
             <div className=" w-full mx-auto max-w-70 md:mx-0">
@@ -121,7 +101,7 @@ const PersonalInformation = () => {
                   isDragActive
                     ? "border-primary bg-primary/5 ring-2 ring-primary/20 scale-[1.015]"
                     : "border-border/60",
-                  "cursor-pointer flex flex-col items-center justify-center text-center min-h-[260px] sm:min-h-[280px]"
+                  "cursor-pointer flex flex-col items-center justify-center text-center min-h-65 sm:min-h-70"
                 )}
               >
                 <input {...getInputProps()} />
@@ -137,7 +117,7 @@ const PersonalInformation = () => {
 
                     <Button
                       size="icon"
-                    //   variant="destructive"
+                      //   variant="destructive"
                       className="absolute -top-3 -right-3 h-7 w-7 rounded-full shadow-md"
                       onClick={handleRemoveImage}
                     >
@@ -165,7 +145,7 @@ const PersonalInformation = () => {
           </div>
 
           {/* ── General Settings Form ── */}
-          <div className="space-y-7 order-2 md:order-none flex-1">
+          <div className="space-y-7 order-2 md:order-0 flex-1">
             <h2 className="text-2xl font-bold">General Information</h2>
 
             <div className="grid gap-6">
@@ -173,9 +153,9 @@ const PersonalInformation = () => {
                 <Label htmlFor="name">Full Name</Label>
                 <Input
                   id="name"
-                  value={generalSettings.name}
-                  onChange={(e:any) =>
-                    setGeneralSettings((prev) => ({ ...prev, name: e.target.value }))
+                  value={formData.name}
+                  onChange={(e: any) =>
+                    setFormData((prev) => ({ ...prev, name: e.target.value }))
                   }
                   className="h-11"
                   placeholder="Your full name"
@@ -183,24 +163,22 @@ const PersonalInformation = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="supportEmail">Support Email</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
-                  id="supportEmail"
+                  id="email"
                   type="email"
-                  value={generalSettings.supportEmail}
-                  onChange={(e:any) =>
-                    setGeneralSettings((prev) => ({ ...prev, supportEmail: e.target.value }))
-                  }
+                  disabled
+                  value={formData.email}
                   className="h-11"
                 />
-              </div>              
+              </div>
             </div>
 
             <div className="pt-2">
               <Button
                 onClick={handleSave}
                 disabled={loading}
-                className="bg-red-600 hover:bg-red-700 text-white px-8 min-w-[160px]"
+                className="bg-red-600 hover:bg-red-700 text-white px-8 min-w-40"
                 size="lg"
               >
                 {loading ? (

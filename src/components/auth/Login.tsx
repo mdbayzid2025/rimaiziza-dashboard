@@ -44,8 +44,8 @@ export default function Login() {
                 Cookies.set("accessToken", response?.data?.token);
                 navigate("/")
             }
-        } catch (error:any) {
-            toast.success(error?.message);
+        } catch (error:any) {            
+            toast.error(error?.data?.message);
         }
     }
 

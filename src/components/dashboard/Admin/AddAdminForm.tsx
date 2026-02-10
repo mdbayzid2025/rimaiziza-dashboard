@@ -36,7 +36,7 @@ export default function AddAdminForm({ onSubmit, onCancel }: AddAdminFormProps) 
         <Input
           id="name"
           name="name"
-          placeholder="John Doe"
+          placeholder="Enter Name"
           className="bg-white h-11"
           required
         />
@@ -48,7 +48,7 @@ export default function AddAdminForm({ onSubmit, onCancel }: AddAdminFormProps) 
           id="email"
           name="email"
           type="email"
-          placeholder="admin@example.com"
+          placeholder="Enter Email"
           className="bg-white h-11"
           required
         />
@@ -60,7 +60,7 @@ export default function AddAdminForm({ onSubmit, onCancel }: AddAdminFormProps) 
           id="password"
           name="password"
           type="text"
-          placeholder="admin@123"
+          placeholder="Enter Password"
           className="bg-white h-11"
           required
           minLength={6}

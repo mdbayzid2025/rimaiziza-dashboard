@@ -29,12 +29,7 @@ const authApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
-    getProfile: build.query({
-      query: () => ({
-        url: "/users/profile",
-      }),
-      transformResponse: (res: { data: any }) => res?.data,
-    }),
+   
     changePassword: build.mutation({
       query: (data) => ({
         url: "/auth/change-password",
@@ -99,6 +94,5 @@ export const {
   useResetPasswordMutation,
   useResendOTPMutation,
   useVerifyOTPMutation,
-  useForgetPasswordMutation,
-  useGetProfileQuery,
+  useForgetPasswordMutation,  
 } = authApi;

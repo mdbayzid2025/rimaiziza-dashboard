@@ -28,9 +28,7 @@ export default function Sidebar() {
   const isActive = (path: string) => location.pathname === path;
 
   const handleLogout = () => {
-    Cookies.remove("accessToken");
-    Cookies.remove("email");
-    Cookies.remove("password");
+    Cookies.remove("accessToken");    
     navigate("/login");
   };
 
