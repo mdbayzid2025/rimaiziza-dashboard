@@ -27,30 +27,13 @@ import AddAdminForm from './AddAdminForm';
 
 
 
-export default function AdminManage({ totalPages = 5 }: any) {
-    
-    const [currentPage, setCurrentPage] = useState(1);
+export default function AdminManage() {
+
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const { data: adminsData, refetch } = useGetAdminQuery({});
     const [addAdmin] = useCreateAdminMutation()
     const [deleteAdmin] = useDeleteAdminMutation()
-
-    console.log("adminsData", adminsData);
-    const handlePageChange = (page: number) => {
-        if (page < 1 || page > totalPages) return;
-        setCurrentPage(page);
-    };
-
-    const getPages = () => {
-        const pages = [];
-        for (let i = 1; i <= totalPages; i++) {
-            pages.push(i);
-        }
-        return pages;
-    };
-
-    
 
     const getStatusBadge = (status: any) => {
         const variants = {
@@ -60,9 +43,6 @@ export default function AdminManage({ totalPages = 5 }: any) {
         };
         return variants[status as keyof typeof variants] || 'bg-gray-100 text-gray-800';
     };
-
-
-
 
     const handleFormSubmit = async (formData: FormData) => {
         const data = Object.fromEntries(formData);
@@ -128,7 +108,7 @@ export default function AdminManage({ totalPages = 5 }: any) {
                                 Manage and monitor administrator accounts
                             </p>
                         </div>
-                        <div className="flex items-center gap-3">                            
+                        <div className="flex items-center gap-3">
                             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                                 <DialogTrigger asChild>
                                     <Button className="bg-purple-600 hover:bg-purple-700">
@@ -191,9 +171,9 @@ export default function AdminManage({ totalPages = 5 }: any) {
                                             <Badge className={getStatusBadge(admin.status)}>{admin.status}</Badge>
                                         </TableCell>
                                         <TableCell>
-                                            <div className="flex items-center justify-end gap-2 pr-5">                                                                                                
+                                            <div className="flex items-center justify-end gap-2 pr-5">
                                                 <Button
-                                                onClick={()=>handleAdminDelete(admin?._id)}                                                    
+                                                    onClick={() => handleAdminDelete(admin?._id)}
                                                     size="sm"
                                                     className="bg-red-600!"
                                                 >
@@ -204,13 +184,13 @@ export default function AdminManage({ totalPages = 5 }: any) {
                                     </TableRow>
                                 )) : <TableRow className="text-center py-12 text-gray-500">
                                     <TableCell colSpan={5}>
-                                    <p className="text-lg text-center py-10">No admins found matching your search.</p>
+                                        <p className="text-lg text-center py-10">No admins found matching your search.</p>
                                     </TableCell>
                                 </TableRow>}
                             </TableBody>
-                        </Table>                        
+                        </Table>
                     </div>
-                
+
                 </CardContent>
             </Card>
         </div>

@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react"
 import { ImageIcon, Upload, X } from "lucide-react"
+import { useEffect, useState } from "react"
 import { cn } from "../../lib/utils"
 import { Button } from "../ui/button"
-import { imageUrl } from "../../redux/base/baseAPI"
 
 
 interface SingleImageUploadProps {

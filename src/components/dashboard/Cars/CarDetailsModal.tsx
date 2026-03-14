@@ -50,8 +50,6 @@ export default function CarDetailsModal({ open, onClose, car }: CarDetailsModalP
         setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length)
     }
 
-    console.log("car", car);
-
     return (
         <Dialog open={open} onOpenChange={onClose}>
             <DialogContent className="max-w-6xl p-0 gap-0 max-h-[90vh] overflow-y-auto">

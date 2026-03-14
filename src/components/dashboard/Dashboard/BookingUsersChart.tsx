@@ -37,7 +37,7 @@ export function BookingUsersChart({ mode = "light" }: OrdersChartProps) {
 
   const [selectedYear, setSelectedYear] = useState(currentYear.toString());
 
-  const { data:bookingUserData, isLoading } = useGetBookingUsersGrowthQuery(selectedYear);
+  const { data:bookingUserData } = useGetBookingUsersGrowthQuery(selectedYear);
 
   
   const gridColor = getGridColor(mode);
@@ -50,9 +50,6 @@ export function BookingUsersChart({ mode = "light" }: OrdersChartProps) {
       users: item.users,
     })) || [];
 
-    console.log("chartData", bookingUserData);
-    console.log("chartData", chartData);
-    
   return (
     <div className="bg-white rounded-lg w-full pb-5 shadow-xl">
       <div className="flex items-center justify-between border-b border-slate-500 mb-5 py-3">

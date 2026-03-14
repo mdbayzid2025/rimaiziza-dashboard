@@ -11,7 +11,7 @@ const bookingApi = baseApi.injectEndpoints({
 
     // Get Single Booking
     getSingleBooking: build.query({
-      query: (id) => `/bookings/${id}`,
+      query: (id) => `/bookings/single/${id}`,
       providesTags: ["booking"],
       transformResponse: (response: { data: any }) => response?.data,
     }),
@@ -44,7 +44,14 @@ const bookingApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["booking"],
     }),
-
+    // Delete Booking
+    cancelBooking: build.mutation({
+      query: (id) => ({
+        url: `/bookings/cancel/${id}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["booking"],
+    }),
   }),
 });
 
@@ -54,4 +61,5 @@ export const {
   useCreateBookingMutation,
   useUpdateBookingStatusMutation,
   useDeleteBookingMutation,
+  useCancelBookingMutation,
 } = bookingApi;

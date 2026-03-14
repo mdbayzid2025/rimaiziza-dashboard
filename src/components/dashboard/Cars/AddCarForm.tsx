@@ -209,8 +209,7 @@ export default function AddCarForm({ onCancel, data, open }: AddCarFormProps) {
       }
 
       if (response?.success) {
-        toast.success(response?.message);
-        console.log("response", response);
+        toast.success(response?.message);        
         onCancel?.();
       }
     } catch (error: any) {

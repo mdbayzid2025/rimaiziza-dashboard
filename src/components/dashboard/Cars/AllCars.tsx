@@ -32,13 +32,19 @@ export default function AllCars() {
   const [deleteCar] = useDeleteCarMutation();
   const { searchTerm, page } = getSearchParams();
   const updateSearchParams = useUpdateSearchParams();
+  const [searchInput, setSearchInput] = useState("");
 
   useEffect(() => {
     refetch();
   }, [searchTerm, page]);
 
+  useEffect(() => {
+    if (searchTerm) {
+      setSearchInput(searchTerm);
+    }
+  }, []);
 
-  const handleDeleteCar = async (car:any) => {
+  const handleDeleteCar = async (car: any) => {
     const result = await Swal.fire({
       title: `Delete ${car?.model} car?`,
       text: "This action cannot be undone.",
@@ -52,9 +58,8 @@ export default function AllCars() {
     if (!result.isConfirmed) return;
 
     try {
-     const response = await deleteCar(car?._id).unwrap();
-      console.log("response", response);
-      
+      const response = await deleteCar(car?._id).unwrap();
+
       if (response?.success) {
         Swal.fire({
           title: "Deleted!",
@@ -79,6 +84,11 @@ export default function AllCars() {
     }
   };
 
+  const handleChange = (e: any) => {
+    updateSearchParams({ searchTerm: e.target.value });
+    setSearchInput(e.target.value);
+  }
+
   return (
     <div className="p-6 space-y-6">
       <Card className="border-none shadow-sm">
@@ -86,15 +96,15 @@ export default function AllCars() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h2 className="text-2xl font-semibold tracking-tight">
-                All Vehicles 
+                All Vehicles
               </h2>
             </div>
             <div className="flex items-center gap-3">
               <div className="relative w-72">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  value={searchTerm}
-                  onChange={(e) => updateSearchParams({ searchTerm: e.target.value })}
+                  value={searchInput}
+                  onChange={handleChange}
                   placeholder="Search vehicles..."
                   className="pl-9 bg-background"
                 />
@@ -214,7 +224,7 @@ export default function AllCars() {
                       <button onClick={() => { setSelectedCar(car); setIsModalOpen(true) }} className="text-muted-foreground hover:text-foreground transition-colors">
                         <Pencil className="h-4 w-4" />
                       </button>
-                      <button onClick={() => handleDeleteCar(car) } className="text-muted-foreground hover:text-red-600 transition-colors">
+                      <button onClick={() => handleDeleteCar(car)} className="text-muted-foreground hover:text-red-600 transition-colors">
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>

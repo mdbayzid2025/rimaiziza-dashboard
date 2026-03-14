@@ -1,6 +1,10 @@
 // pages/bookings/BookingsPage.tsx
-import { Calendar, Eye, Filter, Loader, Search } from "lucide-react";
-import { useState } from "react";
+import { Calendar, Eye, Loader, Search } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useGetBookingsQuery } from "../../../redux/features/booking/bookingApi";
+import { getSearchParams } from "../../../utils/getSearchParams";
+import { useUpdateSearchParams } from "../../../utils/updateSearchParams";
+import ManagePagination from "../../Shared/ManagePagination";
 import { Badge } from "../../ui/badge";
 import { Button } from "../../ui/button";
 import { Card, CardContent, CardHeader } from "../../ui/card";
@@ -21,18 +25,43 @@ import {
     TableRow,
 } from "../../ui/table";
 import BookingDetailsModal from "./BookingDetailsModal";
-import { useGetBookingsQuery } from "../../../redux/features/booking/bookingApi";
-import ManagePagination from "../../Shared/ManagePagination";
 
 export default function Bookings() {
     const [openBookingDetails, setOpenBookingDetails] = useState(false);
     const [selectedBooking, setSelectedBooking] = useState<any>(null);
     const [statusFilter, setStatusFilter] = useState("all");
-    const [searchQuery, setSearchQuery] = useState("");
+    const [searchInput, setSearchInput] = useState("");
 
-    const { data: bookingData, isLoading } = useGetBookingsQuery({});
-    
+    const { data: bookingData, isLoading, refetch } = useGetBookingsQuery({});
+
     const bookings = bookingData?.data ?? [];
+
+    const { searchTerm, page, bookingStatus } = getSearchParams();
+    const updateSearchParams = useUpdateSearchParams();
+
+    useEffect(() => {
+        refetch();
+    }, [searchTerm, page, bookingStatus]);
+
+    useEffect(() => {
+        if (searchTerm) {
+            setSearchInput(searchTerm);
+        }
+        if(statusFilter){
+            setStatusFilter(statusFilter);
+        }
+    }, []);
+
+    const handleChange = (e: any) => {
+        updateSearchParams({ searchTerm: e.target.value });
+        setSearchInput(e.target.value);
+    }
+
+    const handleStatusChange = (value: string) => {
+        setStatusFilter(value);
+        updateSearchParams({ bookingStatus: value === "all" ? "" : value });
+    };
+
 
     const getStatusVariant = (status: string) => {
         switch (status.toUpperCase()) {
@@ -46,6 +75,8 @@ export default function Bookings() {
                 return 'bg-slate-100 text-slate-800 hover:bg-slate-100'
             case 'CANCELED':
             case 'CANCELLED':
+                return 'bg-red-100 text-red-800 hover:bg-red-100'
+            case 'EXPIRED':
                 return 'bg-red-100 text-red-800 hover:bg-red-100'
             default:
                 return 'bg-gray-100 text-gray-800'
@@ -71,10 +102,11 @@ export default function Bookings() {
         });
     };
 
+
     return (
-        <>
+        <div>
             <Card className="border-none shadow-sm m-5">
-                
+
                 <CardHeader>
                     <div className="flex items-center justify-between">
                         <div>
@@ -83,27 +115,30 @@ export default function Bookings() {
                                 Manage your bookings
                             </p>
                         </div>
-                        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                        <div className="flex flex-col sm:flex-row gap-4 mb-6 w-lg">
                             <div className="flex-1 relative">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                                 <Input
                                     placeholder="Search bookings..."
                                     className="pl-10"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    name="search"
+                                    value={searchInput}
+                                    onChange={handleChange}
                                 />
                             </div>
-                            <Select value={statusFilter} onValueChange={setStatusFilter}>
+                            <Select value={statusFilter} name="status" onValueChange={handleStatusChange}>
                                 <SelectTrigger className="w-full sm:w-[180px] h-11! bg-primary! text-white! outline-none!">
                                     <SelectValue placeholder="All Status" className="text-white! border-none!" />
                                 </SelectTrigger>
                                 <SelectContent align="start" className="bg-primary! text-white!">
                                     <SelectItem value="all">All Status</SelectItem>
                                     <SelectItem value="REQUESTED">Requested</SelectItem>
-                                    <SelectItem value="CONFIRMED">Confirmed</SelectItem>
                                     <SelectItem value="PENDING">Pending</SelectItem>
+                                    <SelectItem value="CONFIRMED">Confirmed</SelectItem>
+                                    <SelectItem value="ONGOING">On Going</SelectItem>
                                     <SelectItem value="COMPLETED">Completed</SelectItem>
-                                    <SelectItem value="CANCELED">Canceled</SelectItem>
+                                    <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                                    <SelectItem value="EXPIRED">Expired</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -213,7 +248,7 @@ export default function Bookings() {
                             No bookings found matching your criteria.
                         </div>
                     )}
-                       <ManagePagination meta={bookings?.meta} />                
+                    <ManagePagination meta={bookingData?.meta} />
                 </CardContent>
             </Card>
 
@@ -225,6 +260,6 @@ export default function Bookings() {
                     setSelectedBooking(null);
                 }}
             />
-        </>
+        </div>
     );
 }

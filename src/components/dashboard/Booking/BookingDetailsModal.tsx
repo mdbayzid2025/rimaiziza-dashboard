@@ -1,304 +1,353 @@
 // components/booking/BookingDetailsModal.tsx
-import { Copy } from "lucide-react"
-import { useState } from 'react'
-import { Badge } from "../../ui/badge"
-import { Button } from "../../ui/button"
+import { Copy } from "lucide-react";
+import { useState } from "react";
+import Swal from "sweetalert2";
+import { useCancelBookingMutation, useGetSingleBookingQuery } from "../../../redux/features/booking/bookingApi";
+import { Badge } from "../../ui/badge";
+import { Button } from "../../ui/button";
 import {
     Dialog,
     DialogContent,
-    DialogTitle
-} from "../../ui/dialog"
-import Swal from 'sweetalert2';
-
+    DialogTitle,
+} from "../../ui/dialog";
+import { Skeleton } from "../../ui/skeleton"; // ← add this if you have shadcn skeleton
+import { imageUrl } from "../../../redux/base/baseAPI";
 
 interface BookingDetailsModalProps {
-    open: boolean
-    onClose: () => void
-    booking?: any,
+    open: boolean;
+    onClose: () => void;
+    booking?: { _id: string; bookingId: string }; // minimal shape expected
 }
 
-export default function BookingDetailsModal({ open, onClose, booking }: BookingDetailsModalProps) {
-    const [copiedField, setCopiedField] = useState<string | null>(null)
+export default function BookingDetailsModal({
+    open,
+    onClose,
+    booking,
+}: BookingDetailsModalProps) {
+    const {
+        data: bookingData,
+        isLoading,
+        isError,
+    } = useGetSingleBookingQuery(booking?._id ?? "", {
+        skip: !booking?._id || !open, // prevent unnecessary calls
+    });
+    const [cancelBooking] = useCancelBookingMutation();
+
+    const [copiedField, setCopiedField] = useState<string | null>(null);
 
     const copyToClipboard = (text: string, field: string) => {
-        navigator.clipboard.writeText(text)
-        setCopiedField(field)
-        setTimeout(() => setCopiedField(null), 2000)
-    }
+        navigator.clipboard.writeText(text);
+        setCopiedField(field);
+        setTimeout(() => setCopiedField(null), 1800);
+    };
 
-    const getStatusColor = (status: string) => {
-        switch (status?.toLowerCase()) {
-            case 'confirmed': return 'bg-green-100 text-green-800 hover:bg-green-100'
-            case 'requested': return 'bg-blue-100 text-blue-800 hover:bg-blue-100'
-            case 'pending': return 'bg-amber-100 text-amber-800 hover:bg-amber-100'
-            case 'completed': return 'bg-slate-100 text-slate-800 hover:bg-slate-100'
-            case 'canceled': return 'bg-red-100 text-red-800 hover:bg-red-100'
-            default: return 'bg-gray-100 text-gray-800'
+    const getStatusColor = (status: string = "") => {
+        const s = status.toUpperCase();
+        switch (s) {
+            case "CONFIRMED":
+                return "bg-green-100 text-green-800 hover:bg-green-100";
+            case "PENDING":
+            case "REQUESTED":
+                return "bg-amber-100 text-amber-800 hover:bg-amber-100";
+            case "COMPLETED":
+                return "bg-emerald-100 text-emerald-800 hover:bg-emerald-100";
+            case "CANCELED":
+            case "CANCELLED":
+                return "bg-red-100 text-red-800 hover:bg-red-100";
+            default:
+                return "bg-gray-100 text-gray-800";
         }
+    };
+    
+    const handleCancelBooking = async (id: string) => {
+        onClose()
+    const result = await Swal.fire({
+        title: "Cancel Booking?",
+        text: "Are you sure you want to cancel this booking? This action cannot be undone.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, cancel it",
+        cancelButtonText: "No, keep it",
+        confirmButtonColor: "#dc2626",
+        cancelButtonColor: "#6b7280",
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+        await cancelBooking(id).unwrap();
+        Swal.fire({
+            title: "Cancelled!",
+            text: "Booking has been cancelled successfully.",
+            icon: "success",
+            confirmButtonColor: "#4f46e5",
+        });
+    } catch (error: any) {
+        Swal.fire({
+            title: "Failed!",
+            text: error?.data?.message ?? "Failed to cancel booking.",
+            icon: "error",
+            confirmButtonColor: "#dc2626",
+        });
     }
-
-
-const handleCancelBooking = () => {
-  Swal.fire({
-    title: 'Cancel Booking?',
-    text: 'Are you sure you want to cancel this booking?',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#3085d6',
-    confirmButtonText: 'Yes, Cancel',
-    cancelButtonText: 'No'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      // 👉 Call API here
-    //   cancelBooking(bookingId);
-
-      Swal.fire({
-        title: 'Cancelled!',
-        text: 'Booking has been cancelled.',
-        icon: 'success',
-        timer: 1500,
-        showConfirmButton: false
-      });       
-    }
-  });
 };
 
-const handleIssueRefund = () => {
-  Swal.fire({
-    title: 'Issue Refund?',
-    text: 'Do you want to issue a refund for this booking?',
-    icon: 'question',
-    showCancelButton: true,
-    confirmButtonColor: '#16a34a',
-    cancelButtonColor: '#6b7280',
-    confirmButtonText: 'Yes, Issue Refund',
-    cancelButtonText: 'Cancel'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      // 👉 Call API here
-    //   acceptBooking(bookingId);
 
-      Swal.fire({
-        title: 'Refunded!',
-        text: 'Booking has been refunded.',
-        icon: 'success',
-        timer: 1500,
-        showConfirmButton: false
-      });       
+    
+
+    // Helper to format date nicely
+    const formatDate = (iso?: string) =>
+        iso ? new Date(iso).toLocaleString("en-US", {
+            dateStyle: "medium",
+            timeStyle: "short",
+        }) : "—";
+
+    if (isError) {
+        return (
+            <Dialog open={open} onOpenChange={onClose}>
+                <DialogContent>
+                    <div className="p-6 text-center text-red-600">
+                        Failed to load booking details
+                    </div>
+                </DialogContent>
+            </Dialog>
+        );
     }
-  });
-};
-
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="max-w-6xl p-0 gap-0 max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-5xl p-0 gap-0 max-h-[92vh] overflow-y-auto">
+                {/* Header */}
                 <div className="px-6 pt-5 pb-4 border-b sticky top-0 bg-white z-10">
                     <div className="flex items-center justify-between">
                         <div>
                             <DialogTitle className="text-2xl font-semibold">
-                                Booking Details - {booking?.bookingId}
+                                Booking {bookingData?.bookingId || booking?.bookingId || "..."}
                             </DialogTitle>
                             <p className="text-sm text-muted-foreground mt-1">
-                                Complete booking information
+                                Detailed booking information
                             </p>
                         </div>
-                        <Badge
-                            variant="outline"
-                            className={`px-3 py-1 font-medium capitalize ${getStatusColor(booking?.status)}`}
-                        >
-                            {booking?.status}
-                        </Badge>
+
+                        {isLoading ? (
+                            <Skeleton className="h-7 w-24 rounded-full" />
+                        ) : (
+                            <Badge
+                                variant="outline"
+                                className={`px-4 py-1.5 font-medium capitalize ${getStatusColor(
+                                    bookingData?.bookingStatus
+                                )}`}
+                            >
+                                {bookingData?.bookingStatus?.toLowerCase() || "unknown"}
+                            </Badge>
+                        )}
                     </div>
                 </div>
 
-                <div className="px-6 pb-6 pt-6 space-y-8">
-                    {/* Customer Information */}
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-semibold">Customer Information</h3>
+                {isLoading ? (
+                    <div className="px-6 py-10 space-y-10">
+                        <Skeleton className="h-8 w-48" />
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <p className="text-xs uppercase font-semibold text-muted-foreground mb-1">
-                                    Name
-                                </p>
-                                <p className="font-medium">{booking?.customer?.name}</p>
-                            </div>
-                            <div>
-                                <p className="text-xs uppercase font-semibold text-muted-foreground mb-1">Email</p>
-                                <div className="flex items-center gap-2">
-                                    <p className="font-medium">{booking?.customer?.email}</p>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-7 w-7"
-                                        onClick={() => copyToClipboard(booking?.customer?.email, 'customer-email')}
-                                    >
-                                        <Copy className="h-3.5 w-3.5" />
-                                    </Button>
-                                    {copiedField === 'customer-email' && (
-                                        <span className="text-xs text-green-600">Copied</span>
-                                    )}
-                                </div>
-                            </div>                            
+                            <Skeleton className="h-20" />
+                            <Skeleton className="h-20" />
                         </div>
+                        <Skeleton className="h-32 w-full" />
+                        <Skeleton className="h-40 w-full" />
                     </div>
-
-                    {/* Host Information */}
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-semibold">Host Information</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div>
-                                <p className="text-xs uppercase font-semibold text-muted-foreground mb-1">
-                                    Name
-                                </p>
-                                <p className="font-medium">{booking?.host?.name}</p>
-                            </div>
-                            <div>
-                                <p className="text-xs uppercase font-semibold text-muted-foreground mb-1">Email</p>
-                                <div className="flex items-center gap-2">
-                                    <p className="font-medium">{booking?.host?.email}</p>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-7 w-7"
-                                        onClick={() => copyToClipboard(booking?.host?.email, 'host-email')}
-                                    >
-                                        <Copy className="h-3.5 w-3.5" />
-                                    </Button>
-                                    {copiedField === 'host-email' && (
-                                        <span className="text-xs text-green-600">Copied</span>
-                                    )}
-                                </div>
-                            </div>                            
-                        </div>
-                    </div>
-
-                    {/* Vehicle Information */}
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-semibold">Vehicle</h3>
-                        <div className="flex items-start gap-6 p-4 border rounded-lg bg-muted/20">
-                            <img 
-                                src={booking?.vehicle?.image} 
-                                alt={booking?.vehicle?.name}
-                                className="w-32 h-24 object-cover rounded-lg"
-                            />
-                            <div className="flex-1 space-y-3">
+                ) : (
+                    <div className="px-6 pb-8 pt-6 space-y-9">
+                        {/* 1. Customer Information */}
+                        <section className="space-y-4">
+                            <h3 className="text-lg font-semibold">Customer Information</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div>
                                     <p className="text-xs uppercase font-semibold text-muted-foreground mb-1">
-                                        Vehicle Name
+                                        Name
                                     </p>
-                                    <p className="font-medium text-lg">{booking?.vehicle?.name}</p>
+                                    <p className="font-medium">{bookingData?.user?.name || "—"}</p>
                                 </div>
                                 <div>
                                     <p className="text-xs uppercase font-semibold text-muted-foreground mb-1">
-                                        License Plate
+                                        Email
                                     </p>
-                                    <p className="font-medium">{booking?.vehicle?.plate}</p>
+                                    <div className="flex items-center gap-2">
+                                        <p className="font-medium">{bookingData?.user?.email || "—"}</p>
+                                        {bookingData?.user?.email && (
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-7 w-7"
+                                                onClick={() =>
+                                                    copyToClipboard(bookingData.user.email, "user-email")
+                                                }
+                                            >
+                                                <Copy className="h-3.5 w-3.5" />
+                                            </Button>
+                                        )}
+                                        {copiedField === "user-email" && (
+                                            <span className="text-xs text-green-600">Copied!</span>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </section>
 
-                    {/* Rental Period */}
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-semibold">Rental Period</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div>
-                                <p className="text-xs uppercase font-semibold text-muted-foreground mb-1">
-                                    Start Date
-                                </p>
-                                <p className="font-medium">{booking?.dates?.start}</p>
-                            </div>
-                            <div>
-                                <p className="text-xs uppercase font-semibold text-muted-foreground mb-1">
-                                    End Date
-                                </p>
-                                <p className="font-medium">{booking?.dates?.end}</p>
-                            </div>
-                            <div>
-                                <p className="text-xs uppercase font-semibold text-muted-foreground mb-1">
-                                    Duration
-                                </p>
-                                <p className="font-medium">{booking?.dates?.duration} days</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Pricing */}
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-semibold">Pricing</h3>
-                        <div className="bg-gradient-to-br from-blue-50 to-blue-100/40 border border-blue-200 rounded-xl p-6">
-                            <div className="space-y-3">
-                                <div className="flex justify-between items-center">
-                                    <p className="text-sm font-medium text-blue-800/90">
-                                        ${booking?.pricing?.dailyRate}/day × {booking?.pricing?.days} days
+                        {/* 2. Host Information */}
+                        <section className="space-y-4">
+                            <h3 className="text-lg font-semibold">Host Information</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                <div>
+                                    <p className="text-xs uppercase font-semibold text-muted-foreground mb-1">
+                                        Name
                                     </p>
-                                    <p className="text-lg font-semibold text-blue-700">
-                                        ${booking?.pricing?.subtotal?.toLocaleString()}
+                                    <p className="font-medium">{bookingData?.host?.name || "—"}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs uppercase font-semibold text-muted-foreground mb-1">
+                                        Email
+                                    </p>
+                                    <div className="flex items-center gap-2">
+                                        <p className="font-medium">{bookingData?.host?.email || "—"}</p>
+                                        {bookingData?.host?.email && (
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-7 w-7"
+                                                onClick={() =>
+                                                    copyToClipboard(bookingData.host.email, "host-email")
+                                                }
+                                            >
+                                                <Copy className="h-3.5 w-3.5" />
+                                            </Button>
+                                        )}
+                                        {copiedField === "host-email" && (
+                                            <span className="text-xs text-green-600">Copied!</span>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* 3. Vehicle Information */}
+                        <section className="space-y-4">
+                            <h3 className="text-lg font-semibold">Vehicle</h3>
+                            <div className="flex flex-col sm:flex-row items-start gap-5 p-4 border rounded-xl bg-muted/30">
+                                {bookingData?.car?.coverImage ? (
+                                    <img
+                                        src={ imageUrl + bookingData.car.coverImage}                                        
+                                        alt={`${bookingData.car.brand} ${bookingData.car.model}`}
+                                        className="w-full sm:w-36 h-28 object-cover rounded-lg border"
+                                        onError={(e) => (e.currentTarget.src = "/fallback-car.jpg")}
+                                    />
+                                ) : (
+                                    <div className="w-36 h-28 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500 text-sm">
+                                        No image
+                                    </div>
+                                )}                               
+                                <div className="flex-1 space-y-3">
+                                    <div>
+                                        <p className="text-xs uppercase font-semibold text-muted-foreground mb-1">
+                                            Vehicle
+                                        </p>
+                                        <p className="font-semibold text-lg">
+                                            {bookingData?.car?.brand} {bookingData?.car?.model} ({bookingData?.car?.year})
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs uppercase font-semibold text-muted-foreground mb-1">
+                                            License Plate
+                                        </p>
+                                        <p className="font-medium">{bookingData?.car?.licensePlate || "—"}</p>
+                                    </div>
+                                    <div className="text-sm text-muted-foreground">
+                                        {bookingData?.car?.shortDescription || bookingData?.car?.about || "—"}
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* 4. Rental Period */}
+                        <section className="space-y-4">
+                            <h3 className="text-lg font-semibold">Rental Period</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                <div>
+                                    <p className="text-xs uppercase font-semibold text-muted-foreground mb-1">
+                                        Start
+                                    </p>
+                                    <p className="font-medium">{formatDate(bookingData?.fromDate)}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs uppercase font-semibold text-muted-foreground mb-1">
+                                        End
+                                    </p>
+                                    <p className="font-medium">{formatDate(bookingData?.toDate)}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs uppercase font-semibold text-muted-foreground mb-1">
+                                        Duration
+                                    </p>
+                                    <p className="font-medium">
+                                        {bookingData?.extendedHours
+                                            ? `${bookingData.extendedHours} extra hours`
+                                            : "1 day" /* you can calculate properly */}
                                     </p>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </section>
 
-                    {/* Financial Breakdown */}
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-semibold">Financial Breakdown</h3>
-                        <div className="border rounded-lg divide-y">
-                            <div className="p-4 flex justify-between items-center">
-                                <p className="font-medium">Subtotal:</p>
-                                <p className="text-lg font-semibold">
-                                    ${booking?.pricing?.subtotal?.toLocaleString()}
-                                </p>
-                            </div>
-                            <div className="p-4 flex justify-between items-center bg-red-50/50">
-                                <p className="font-medium">
-                                    Platform Fee ({booking?.pricing?.platformFeePercentage}%):
-                                </p>
-                                <p className="text-lg font-semibold text-red-600">
-                                    -${booking?.pricing?.platformFee?.toLocaleString()}
-                                </p>
-                            </div>
-                            <div className="p-4 flex justify-between items-center bg-green-50">
-                                <p className="font-bold text-lg">Host Earnings:</p>
-                                <p className="text-2xl font-bold text-green-600">
-                                    ${booking?.pricing?.hostEarnings?.toLocaleString()}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                        {/* 5. Pricing & Financials */}
+                        <section className="space-y-6">
+                            <h3 className="text-lg font-semibold">Financial Summary</h3>
 
-                    {/* Admin Override Actions */}
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-semibold">Admin Override Actions</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <Button 
-                                variant="secondary" 
-                                size="lg"
-                                className="border-black/50! border-2!"
-                                onClick={() => {
-                                    handleCancelBooking();
-                                    onClose();
-                                }}
-                            >
-                                Cancel Booking
-                            </Button>
+                            <div className="border rounded-xl overflow-hidden divide-y">
+                                <div className="p-4 flex justify-between items-center">
+                                    <span>Rental Price</span>
+                                    <span className="font-medium">
+                                        RM {bookingData?.rentalPrice?.toLocaleString()}
+                                    </span>
+                                </div>
+                                <div className="p-4 flex justify-between items-center text-red-700 bg-red-50/60">
+                                    <span>Platform Fee</span>
+                                    <span>RM {bookingData?.platformFee?.toLocaleString()}</span>
+                                </div>
+                                <div className="p-4 flex justify-between items-center text-green-700 bg-green-50">
+                                    <span className="font-bold">Host Earnings</span>
+                                    <span className="font-bold text-lg">
+                                        RM {bookingData?.hostCommission?.toLocaleString()}
+                                    </span>
+                                </div>
+                                <div className="p-4 flex justify-between items-center bg-gray-50 font-semibold">
+                                    <span>Total Amount (Customer)</span>
+                                    <span className="text-xl">
+                                        RM {bookingData?.totalAmount?.toLocaleString()}
+                                    </span>
+                                </div>
+                            </div>
 
-                            <Button 
-                                
-                                className=""
-                                onClick={() => {
-                                    handleIssueRefund();
-                                    onClose();
-                                }}
-                            >
-                                Issue Refund
-                            </Button>
-                        </div>
+                            <div className="text-sm text-muted-foreground">
+                                Deposit amount: RM {bookingData?.car?.depositAmount || 100} (not included in total)
+                            </div>
+                        </section>
+
+                        {/* 6. Admin Actions */}
+                        <section className="space-y-4 pt-4 border-t">
+                            <h3 className="text-lg font-semibold text-destructive">Admin Actions</h3>
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <Button
+                                    variant="outline"
+                                    className="border-red-500 text-red-600 hover:bg-red-50 flex-1"
+                                    onClick={() => {
+                                        handleCancelBooking(bookingData?._id);
+                                    }}
+                                    disabled={bookingData?.bookingStatus === "CANCELED"}
+                                >
+                                    Cancel Booking
+                                </Button>                                
+                            </div>
+                        </section>
                     </div>
-                </div>
+                )}
             </DialogContent>
         </Dialog>
-    )
+    );
 }

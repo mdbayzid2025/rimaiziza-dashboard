@@ -4,17 +4,21 @@ import {
     Car,
     Copy,
     Eye,
-    Filter,
     Loader,
     Lock,
     Mail,
-    Pencil,
     Search,
     Trash2,
+    Unlock,
     UserPlus
 } from "lucide-react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
+import { useDeleteHostMutation, useGetHostsQuery, useUpdateHostMutation } from "../../../redux/features/host/hostApi";
+import { getSearchParams } from "../../../utils/getSearchParams";
+import { useUpdateSearchParams } from "../../../utils/updateSearchParams";
+import ManagePagination from "../../Shared/ManagePagination";
 import { Badge } from "../../ui/badge";
 import { Button } from "../../ui/button";
 import { Card, CardContent, CardHeader } from "../../ui/card";
@@ -28,20 +32,31 @@ import {
     TableHeader,
     TableRow,
 } from "../../ui/table";
-import HostDetailsModal from "./HostDetailsModal";
-import { useDeleteHostMutation, useGetHostsQuery } from "../../../redux/features/host/hostApi";
 import AddHostForm from "./AddHostForm";
-import Swal from "sweetalert2";
+import HostDetailsModal from "./HostDetailsModal";
 
 export default function Hosts() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedHost, setSelectedHost] = useState<any>(null);
     const [openHostDetails, setOpenHostDetails] = useState(false);
-
-    const { data: hostsData, isLoading } = useGetHostsQuery({});
+    const [searchInput, setSearchInput] = useState("");
+    const { data: hostsData, isLoading, refetch } = useGetHostsQuery({});
     const [deleteHost] = useDeleteHostMutation()
-    const hosts = hostsData?.data ?? [];
+    const [updateHostStatus] = useUpdateHostMutation();
 
+    const hosts = hostsData?.data ?? [];
+    const { searchTerm, page } = getSearchParams();
+    const updateSearchParams = useUpdateSearchParams();
+
+    useEffect(() => {
+        refetch();
+    }, [searchTerm, page]);
+
+    useEffect(() => {
+        if (searchTerm) {
+            setSearchInput(searchTerm);
+        }
+    }, []);
 
     const getStatusVariant = (status: string) => {
         switch (status.toLowerCase()) {
@@ -71,7 +86,6 @@ export default function Hosts() {
 
         try {
             const response = await deleteHost(host._id).unwrap();
-            console.log("response", response);
 
             if (response?.success) {
                 Swal.fire({
@@ -96,6 +110,46 @@ export default function Hosts() {
         }
     }
 
+    const handleStatusChange = async (id: string, status: string) => {
+        const isLocking = status === "INACTIVE";
+
+        const result = await Swal.fire({
+            title: isLocking ? "Lock this host?" : "Unlock this host?",
+            text: isLocking
+                ? "This host will not be able to access the platform."
+                : "This host will regain access to the platform.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: isLocking ? "#d33" : "#3085d6",
+            cancelButtonColor: "#6b7280",
+            confirmButtonText: isLocking ? "Yes, Lock Host" : "Yes, Unlock Host",
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+             await updateHostStatus({ id, status }).unwrap();
+
+            Swal.fire({
+                icon: "success",
+                title: isLocking ? "Host Locked" : "Host Unlocked",
+                timer: 1500,
+                showConfirmButton: false,
+            });
+
+        } catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Something went wrong",
+                text: "Failed to update host status",
+            });
+        }
+    };
+
+    const handleChange = (e: any) => {
+        updateSearchParams({ searchTerm: e.target.value });
+        setSearchInput(e.target.value);
+    }
     return (
         <div className="">
             <Card className="border-none shadow-sm m-5">
@@ -110,6 +164,8 @@ export default function Hosts() {
                             <div className="relative w-72">
                                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                 <Input
+                                    value={searchInput}
+                                    onChange={handleChange}
                                     placeholder="Search host..."
                                     className="pl-10 bg-white"
                                 />
@@ -243,6 +299,17 @@ export default function Hosts() {
                                             >
                                                 <Eye className="h-4 w-4" />
                                             </Button>
+                                            <Button
+                                                size="sm"
+                                                onClick={() => handleStatusChange(host?._id, host?.status?.toLowerCase() === "active" ? "INACTIVE" : "ACTIVE")}
+                                                className={`${host?.status?.toLowerCase() === "active" ? "bg-red-200! text-red-600!" : "bg-green-200! text-green-600!"} 
+                                                                                         cursor-pointer hover:scale-110 transition-transform`}>
+                                                {host?.status?.toLowerCase() === "active" ? (
+                                                    <Lock className="w-4 h-4  cursor-pointer hover:scale-110 transition-transform" />
+                                                ) : (
+                                                    <Unlock className="w-4 h-4 cursor-pointer hover:scale-110 transition-transform" />
+                                                )}
+                                            </Button>
                                             <button onClick={() => handleHostDelete(host)} className="text-muted-foreground hover:text-red-600 transition-colors">
                                                 <Trash2 className="h-4 w-4" />
                                             </button>
@@ -257,6 +324,7 @@ export default function Hosts() {
                         </TableBody>
                     </Table>
                 </CardContent>
+                <ManagePagination meta={hostsData?.meta} />
             </Card>
             <HostDetailsModal
                 open={openHostDetails}

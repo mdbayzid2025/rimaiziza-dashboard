@@ -1,33 +1,24 @@
-import { Edit, Loader, Lock, Mail, Search, Trash2, Unlock, UserPlus } from "lucide-react";
+import { Loader, Lock, Mail, Search, Trash2, Unlock } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Badge } from "../../ui/badge";
 import { Button } from "../../ui/button";
 import { Card, CardContent, CardHeader } from "../../ui/card";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "../../ui/dialog";
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../ui/table";
 
-import AddUserForm from "./AddUserForm";
-import { useGetUsersQuery, useUpdateUserMutation } from "../../../redux/features/user/userApi";
-import ManagePagination from "../../Shared/ManagePagination";
+import Swal from "sweetalert2";
 import { imageUrl } from "../../../redux/base/baseAPI";
+import { useGetUsersQuery, useUpdateUserMutation } from "../../../redux/features/user/userApi";
 import { getSearchParams } from "../../../utils/getSearchParams";
 import { useUpdateSearchParams } from "../../../utils/updateSearchParams";
+import ManagePagination from "../../Shared/ManagePagination";
 import { Input } from "../../ui/input";
-import { toast } from "sonner";
-import Swal from "sweetalert2";
 
 export default function Users() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const { data: userData, isLoading, refetch } = useGetUsersQuery({});
-    const [updateUserStatus, { isLoading: updateLoading }] = useUpdateUserMutation();
-
+    const [updateUserStatus] = useUpdateUserMutation();
+    const [searchInput, setSearchInput] = useState("");
     const users = userData?.data || [];
     const { searchTerm, page } = getSearchParams();
     const updateSearchParams = useUpdateSearchParams();
@@ -36,6 +27,11 @@ export default function Users() {
         refetch();
     }, [searchTerm, page]);
 
+    useEffect(() => {
+        if (searchTerm) {
+            setSearchInput(searchTerm);
+        }
+    }, []);
 
     const formatDate = (date: string) => {
         return new Date(date).toLocaleDateString();
@@ -80,10 +76,7 @@ export default function Users() {
         if (!result.isConfirmed) return;
 
         try {
-            const response = await updateUserStatus({ id, status }).unwrap();
-
-            console.log("response", response);
-
+            await updateUserStatus({ id, status }).unwrap();
 
             Swal.fire({
                 icon: "success",
@@ -100,6 +93,11 @@ export default function Users() {
             });
         }
     };
+
+    const handleChange = (e: any) => {
+        updateSearchParams({ searchTerm: e.target.value });
+        setSearchInput(e.target.value);
+    }
     return (
         <div className="p-5">
             <Card className="border-0">
@@ -116,41 +114,11 @@ export default function Users() {
                             <div className="relative w-72">
                                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                 <Input
-                                    value={searchTerm}
-                                    onChange={(e) => updateSearchParams({ searchTerm: e.target.value })}
-                                    placeholder="Search vehicles..."
+                                    value={searchInput}
+                                    onChange={handleChange}
+                                    placeholder="Search users"
                                     className="pl-9 bg-background"
                                 />
-                            </div>
-                            <div>
-                                <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                                    <DialogTrigger asChild>
-                                        <Button className="bg-indigo-600 hover:bg-indigo-700 border-0">
-                                            <UserPlus className="w-4 h-4 mr-2" />
-                                            Add Car
-                                        </Button>
-                                    </DialogTrigger>
-                                    <DialogContent className="min-w-4xl! max-h-[90vh] overflow-y-auto">
-                                        <DialogHeader>
-                                            <DialogTitle className="text-2xl font-semibold">
-                                                Add New User
-                                            </DialogTitle>
-                                        </DialogHeader>
-
-                                        <div className="mt-4">
-                                            <AddUserForm
-                                                onSubmit={(formData) => {
-                                                    console.log(
-                                                        "Form submitted:",
-                                                        Object.fromEntries(formData)
-                                                    );
-                                                    setIsModalOpen(false);
-                                                }}
-                                                onCancel={() => setIsModalOpen(false)}
-                                            />
-                                        </div>
-                                    </DialogContent>
-                                </Dialog>
                             </div>
                         </div>
                     </div>
@@ -243,12 +211,12 @@ export default function Users() {
                                         <div className="flex gap-3 justify-center">
                                             <Button
                                                 onClick={() => handleStatusChange(user?._id, user?.status?.toLowerCase() === "active" ? "INACTIVE" : "ACTIVE")}
-                                                className={`${user?.status?.toLowerCase() === "active" ? "bg-red-200! text-white" : "bg-green-600 text-white"} 
+                                                className={`${user?.status?.toLowerCase() === "active" ? "bg-red-200! text-red-600!" : "bg-green-200! text-green-600!"} 
                                              cursor-pointer hover:scale-110 transition-transform`}>
                                                 {user?.status?.toLowerCase() === "active" ? (
-                                                    <Lock className="w-4 h-4 text-red-600 cursor-pointer hover:scale-110 transition-transform" />
+                                                    <Lock className="w-4 h-4  cursor-pointer hover:scale-110 transition-transform" />
                                                 ) : (
-                                                    <Unlock className="w-4 h-4 text-green-600 cursor-pointer hover:scale-110 transition-transform" />
+                                                    <Unlock className="w-4 h-4 cursor-pointer hover:scale-110 transition-transform" />
                                                 )}
                                             </Button>
                                             <Button variant="outline">

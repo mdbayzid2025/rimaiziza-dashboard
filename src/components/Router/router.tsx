@@ -13,6 +13,7 @@ import OTPVerifyPage from "../auth/OTPVerifyPage";
 import NewPassword from "../auth/NewPassword";
 import PrivateRoute from "./PrivateRouter";
 import AdminManage from "../dashboard/Admin/Admins";
+import Notificatiion from "../dashboard/Notification/Notification";
 
 const router = createBrowserRouter([
     {
@@ -49,6 +50,10 @@ const router = createBrowserRouter([
             {
                 path: "setting",
                 element: <Settings />
+            },
+            {
+                path: "notification",
+                element: <Notificatiion />
             },
         ]
     },

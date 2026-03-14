@@ -1,9 +1,7 @@
 import { UserPlus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { imageUrl } from "../../../redux/base/baseAPI";
 import { useCreateHostMutation, useUpdateHostMutation } from "../../../redux/features/host/hostApi";
-import { SingleImageUpload } from "../../Shared/SingleImageUpload";
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
@@ -34,10 +32,7 @@ export default function AddHostForm({ onCancel, data, open }: AddHostFormProps) 
   const isEditMode = !!data?._id;
 
   const [fields, setFields] = useState<FormFields>(defaultFields);
-  const [profileImage, setProfileImage] = useState<File | null>(null);
-  const [coverImage, setCoverImage] = useState<File | null>(null);
-  const [existProfileImage, setExistProfileImage] = useState("");
-  const [existCoverImage, setExistCoverImage] = useState("");
+  
   const [showPassword, setShowPassword] = useState(false);
 
   const [createHost] = useCreateHostMutation();
@@ -51,9 +46,7 @@ export default function AddHostForm({ onCancel, data, open }: AddHostFormProps) 
         email: data.email || "",
         password: "", // never pre-fill password hash
         status: data.status || "ACTIVE",
-      });
-      if (data.profileImage) setExistProfileImage(data.profileImage);
-      if (data.coverImage) setExistCoverImage(data.coverImage);
+      });      
     }
   }, [data]);
 
@@ -81,9 +74,6 @@ export default function AddHostForm({ onCancel, data, open }: AddHostFormProps) 
     }
 
     formData.append("data", JSON.stringify(payload));
-
-    if (profileImage) formData.append("profileImage", profileImage);
-    if (coverImage) formData.append("coverImage", coverImage);
 
     try {
       let response;

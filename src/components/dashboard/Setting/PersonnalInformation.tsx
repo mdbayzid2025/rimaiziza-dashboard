@@ -1,19 +1,20 @@
 
-import { Loader2, Save, User, X } from 'lucide-react';
+import { Save, User, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { toast } from 'sonner';
 import { cn } from '../../../lib/utils';
+import { imageUrl } from '../../../redux/base/baseAPI';
+import { useEditProfileMutation, useGetProfileQuery } from '../../../redux/features/user/userApi';
 import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
 import { Button } from '../../ui/button';
 import { Card, CardContent } from '../../ui/card';
 import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
-import { useEditProfileMutation, useGetProfileQuery } from '../../../redux/features/user/userApi';
-import { toast } from 'sonner';
 
 
 const PersonalInformation = () => {
-  const [loading, setLoading] = useState(false);
+
 
   const [formData, setFormData] = useState({ name: "", email: "" });
 
@@ -25,10 +26,10 @@ const PersonalInformation = () => {
   const { data: profileData } = useGetProfileQuery({});
   const [editProfile] = useEditProfileMutation()
 
-  console.log("profileData", profileData)
+
   useEffect(() => {
     setFormData({ name: profileData?.name, email: profileData?.email });
-    setExistingProfileUrl(profileData?.profileImage)
+    setExistingProfileUrl(imageUrl + profileData?.profileImage)
   }, [profileData])
 
   // ────────────── react-dropzone configuration ───────────────────────────────
@@ -59,6 +60,7 @@ const PersonalInformation = () => {
   const handleRemoveImage = (e: React.MouseEvent) => {
     e.stopPropagation();
     setProfilePreview(null);
+    setExistingProfileUrl(null);
     setSelectedFile(null);
   };
 
@@ -116,7 +118,6 @@ const PersonalInformation = () => {
 
                     <Button
                       size="icon"
-                      //   variant="destructive"
                       className="absolute -top-3 -right-3 h-7 w-7 rounded-full shadow-md"
                       onClick={handleRemoveImage}
                     >
@@ -175,22 +176,12 @@ const PersonalInformation = () => {
 
             <div className="pt-2">
               <Button
-                onClick={handleSave}
-                disabled={loading}
+                onClick={handleSave}                
                 className="bg-red-600 hover:bg-red-700 text-white px-8 min-w-40"
                 size="lg"
               >
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="mr-2 h-5 w-5" />
-                    Save Changes
-                  </>
-                )}
+                <Save className="mr-2 h-5 w-5" />
+                Save Changes
               </Button>
             </div>
           </div>

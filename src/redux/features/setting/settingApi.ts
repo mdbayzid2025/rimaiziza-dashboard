@@ -24,41 +24,36 @@ const settingApi = baseApi.injectEndpoints({
       invalidatesTags: ["faqs"]
     }),
     deleteFAQ: builder.mutation({
-      query: (id)=> {
+      query: (id) => {
         return {
           url: `/faqs/${id}`,
-          method: "DELETE",          
+          method: "DELETE",
         }
       }
     }),
 
-
-
-   getAbout: builder.query({
+    getAbout: builder.query({
       query: () => "/rules/ABOUT",
       transformResponse: (res: { data: any }) => res?.data,
-    }),
-    addAbout: builder.mutation({
-      query: (data) => ({
-          url: "/settings",
-          method: "POST",
-          body: data,
-        }),
+      providesTags: ["rules"],
     }),
     getPrivacyPolicy: builder.query({
       query: () => "/rules/PRIVACY",
       transformResponse: (res: { data: any }) => res?.data,
+      providesTags: ["rules"],
     }),
     getTermsCondition: builder.query({
-      query: () => "/rules/TERMS",      
+      query: () => "/rules/TERMS",
       transformResponse: (res: { data: any }) => res?.data,
+      providesTags: ["rules"],
     }),
     addDisclaimer: builder.mutation({
       query: (data) => ({
-          url: "/rules",
-          method: "POST",
-          body: data,
-        }),
+        url: "/rules",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["rules"],
     }),
 
     addSupport: builder.mutation({
@@ -76,15 +71,17 @@ const settingApi = baseApi.injectEndpoints({
     }),
     // ---------------- Commission Manage  Start---------------
     getCommission: builder.query({
-      query: () => "/platform/get-platform-fees",
+      query: () => "/charges",
       transformResponse: (res: { data: any }) => res?.data,
+      providesTags: ["commission"],
     }),
-    updateCommission: builder.mutation({      
-        query: (data) => ({
-          url: `/platform/update-platform-fee/${data?.id}`,
-          method: "PUT",
-          body: data,
-        }),
+    postCommission: builder.mutation({
+      query: (data) => ({
+        url: `/charges`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["commission"],
     }),
 
     // ---------------- Commission Manage  End---------------
@@ -107,9 +104,8 @@ export const {
   useAddSupportMutation,
 
   useGetCommissionQuery,
-  useUpdateCommissionMutation,
-
-  useAddAboutMutation,
+  usePostCommissionMutation,
+  
   useAddFAQMutation,
   useUpdateFAQMutation,
   useDeleteFAQMutation,

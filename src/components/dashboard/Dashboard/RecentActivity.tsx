@@ -1,55 +1,77 @@
-import { Car, CheckCircle, Clock, CreditCard, MapPin, UserPlus } from 'lucide-react';
+import { Bell, Car, CheckCircle, Clock, CreditCard, MapPin, Settings, UserPlus } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '../../ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../ui/table';
+import { useGetRecentActivitiesQuery } from '../../../redux/features/notification/notificationApi';
+import { useSocket } from '../../../hooks/socketConnection';
+import { useEffect } from 'react';
+import { useGetProfileQuery } from '../../../redux/features/user/userApi';
+
+const getTypeConfig = (type: string) => {
+    switch (type?.toUpperCase()) {
+        case 'REQUESTED':
+            return { icon: Car, color: 'bg-blue-100 text-blue-700' };
+        case 'APPROVED':
+            return { icon: CheckCircle, color: 'bg-green-100 text-green-700' };
+        case 'REJECTED':
+            return { icon: CheckCircle, color: 'bg-red-100 text-red-700' };
+        case 'PAYMENT':
+            return { icon: CreditCard, color: 'bg-yellow-100 text-yellow-700' };
+        case 'USER':
+            return { icon: UserPlus, color: 'bg-purple-100 text-purple-700' };
+        case 'ADMIN':
+            return { icon: Settings, color: 'bg-indigo-100 text-indigo-700' };
+        default:
+            return { icon: Bell, color: 'bg-gray-100 text-gray-700' };
+    }
+};
+
+const getDetails = (refModel: any, activity: any)=>{
+    switch (refModel?.toLowerCase()) {
+        case 'car':
+            return `${activity.referenceId?.pickupPoint?.address}`;
+        case 'booking':
+            return `${activity.referenceId?.pickupPoint?.address}`;
+        case 'review':
+            return `${activity.referenceId?.pickupPoint?.address}`;       
+        case 'user':
+            return `${activity.referenceId?.pickupPoint?.address}`;        
+        default:
+            return `${activity.referenceId?.pickupPoint?.address}`;
+    }
+}
+
+const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+    return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
+};
 
 const RecentActivity = () => {
-    const activities = [
-        { 
-            id: 1, 
-            type: 'New booking', 
-            icon: Car, 
-            color: 'bg-blue-100 text-blue-800 hover:bg-blue-100', 
-            title: 'Tesla Model 3 booked by John Doe',
-            time: '5 minutes ago',
-            details: 'Tesla Model 3 • John Doe'
-        },
-        { 
-            id: 2, 
-            type: 'Vehicle added', 
-            icon: Car, 
-            color: 'bg-green-100 text-green-800 hover:bg-green-100', 
-            title: 'BMW X5 added to fleet',
-            time: '1 hour ago',
-            details: 'BMW X5 • Fleet updated'
-        },
-        { 
-            id: 3, 
-            type: 'Payment received', 
-            icon: CreditCard, 
-            color: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100', 
-            title: '$450 from booking #1234',
-            time: '2 hours ago',
-            details: '$450 • Booking #1234'
-        },
-        { 
-            id: 4, 
-            type: 'New host registered', 
-            icon: UserPlus, 
-            color: 'bg-purple-100 text-purple-800 hover:bg-purple-100', 
-            title: 'Sarah Miller joined as host',
-            time: '3 hours ago',
-            details: 'Sarah Miller • Host registration'
-        },
-        { 
-            id: 5, 
-            type: 'Booking completed', 
-            icon: CheckCircle, 
-            color: 'bg-indigo-100 text-indigo-800 hover:bg-indigo-100', 
-            title: 'Mercedes E-Class returned',
-            time: '5 hours ago',
-            details: 'Mercedes E-Class • Vehicle returned'
+    const { data, isLoading, refetch } = useGetRecentActivitiesQuery({});
+    const { data: profileData } = useGetProfileQuery({});
+    const activities = data?.data ?? [];
+
+      const socket = useSocket()
+    
+      useEffect(() => {
+        if (!socket) return;
+    
+        socket.on(`send-notification::${profileData?._id}`, () => {refetch()});
+        socket.on(`unreadCountUpdate::${profileData?._id}`, () => {refetch()});
+    
+        return () => {
+          socket.off(`send-notification::${profileData?._id}`);
+          socket.off(`unreadCountUpdate::${profileData?._id}`);
         }
-    ];
+      }, [])
 
     return (
         <div className="p-5">
@@ -64,44 +86,62 @@ const RecentActivity = () => {
                 </CardHeader>
                 <CardContent className="p-0">
                     <Table>
-                        <TableHeader >
+                        <TableHeader>
                             <TableRow className="bg-gray-100 border-b">
                                 <TableHead className="text-gray-600 font-semibold uppercase text-xs pl-10 w-[60%]">Activity</TableHead>
                                 <TableHead className="text-gray-600 font-semibold uppercase text-xs w-[40%] text-right pr-10">Time</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {activities.map((activity) => {
-                                const IconComponent = activity.icon;
-                                return (
-                                    <TableRow key={activity.id} className="hover:bg-gray-50/50 border-b last:border-b-0">
-                                        <TableCell className="pl-10 pr-4 py-4">
-                                            <div className="flex items-start gap-4">
-                                                <div className={`flex-shrink-0 w-11 h-11 rounded-2xl ${activity.color} flex items-center justify-center`}>
-                                                    <IconComponent className="w-5 h-5" />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="font-medium text-gray-900 text-sm leading-5 mb-1 truncate">{activity.title}</div>
-                                                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                                                        <MapPin className="w-3 h-3" />
-                                                        <span className="truncate">{activity.details}</span>
+                            {isLoading ? (
+                                <TableRow>
+                                    <TableCell colSpan={2} className="text-center py-12 text-gray-400">
+                                        <div className="flex items-center justify-center gap-2">
+                                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-400" />
+                                            Loading...
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                activities.map((activity: any) => {
+                                    const { color } = getTypeConfig(activity.type);                                    
+                                    const detail = getDetails(activity?.referenceModel, activity);
+
+                                    return (
+                                        <TableRow
+                                            key={activity._id}
+                                            className="hover:bg-gray-50/50 border-b last:border-b-0"
+                                        >
+                                            <TableCell className="pl-10 pr-4 py-4">
+                                                <div className="flex items-start gap-4">
+                                                    <div className={`flex-shrink-0 w-11 h-11 rounded-2xl ${color} flex items-center justify-center`}>
+                                                        <Bell className="w-5 h-5" />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="font-medium text-gray-900 text-sm leading-5 mb-1">
+                                                            {activity.text}
+                                                        </div>
+                                                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                                                            <MapPin className="w-3 h-3 flex-shrink-0" />
+                                                            <span className="truncate">{detail}</span>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="text-right pr-10 py-4">
-                                            <div className="flex items-center justify-end gap-2 text-sm text-gray-600">
-                                                <Clock className="w-3 h-3" />
-                                                <span>{activity.time}</span>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                );
-                            })}
+                                            </TableCell>
+                                            <TableCell className="text-right pr-10 py-4">
+                                                <div className="flex items-center justify-end gap-2 text-sm text-gray-600 whitespace-nowrap">
+                                                    <Clock className="w-3 h-3" />
+                                                    <span>{formatTimeAgo(activity.createdAt)}</span>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })
+                            )}
                         </TableBody>
                     </Table>
 
-                    {activities.length === 0 && (
+                    {!isLoading && activities.length === 0 && (
                         <div className="text-center py-12 text-gray-500">
                             No recent activity found.
                         </div>
@@ -113,10 +153,3 @@ const RecentActivity = () => {
 };
 
 export default RecentActivity;
-
-
-
-
-
-
-// data-aos="fade-up" data-aos-delay={800}

@@ -19,10 +19,7 @@ const NewPassword = () => {
     if (password !== confirmPassword) {
       toast.error("Passwords do not match");
       return;
-    }
-
-    // Submit your password data here
-    console.log("New Password Submitted:", { password, confirmPassword });
+    }    
     toast.success("Password submitted successfully!");
   };
 

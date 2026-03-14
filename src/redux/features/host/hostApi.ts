@@ -25,11 +25,12 @@ const hostApi = baseApi.injectEndpoints({
         }),
 
         updateHost: builder.mutation({
-            query: ({ id, ...body }) => ({
-                url: `/hosts/${id}`,
-                method: "PUT",
-                body,
+            query: (data) => ({
+                url: `/users/hosts/status/${data?.id}`,
+                method: "PATCH",
+                body: data,
             }),
+             invalidatesTags: ['host'],
         }),
 
         deleteHost: builder.mutation({

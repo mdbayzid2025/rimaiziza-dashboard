@@ -1,18 +1,12 @@
 // pages/settings/SettingsPage.tsx
-import { DollarSign, Eye, EyeOff, FileText, Globe, Loader2, Save, Shield } from "lucide-react";
-import { useState } from "react";
-import { Button } from "../../ui/button";
-import { Card, CardContent } from "../../ui/card";
-import { Input } from "../../ui/input";
-import { Label } from "../../ui/label";
+import { DollarSign, FileText, Globe, Shield } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
+import AboutUs from "./AboutUs";
 import CommissionManage from "./CommissionManage";
 import PersonnalInformation from "./PersonnalInformation";
 import PrivacyPolicy from "./PrivacyPolicy";
 import TermsCondition from "./TermsCondition";
-import AboutUs from "./AboutUs";
-import { useChangePasswordMutation } from "../../../redux/features/auth/authApi";
-import { toast } from "sonner";
+import ChangePassword from "./ChangePassword";
 
 const TABS = [
     { value: "general", label: "Information", icon: Globe, animate: "fade-up-right", delay: 100 },
@@ -24,41 +18,7 @@ const TABS = [
 ];
 
 export default function Setting() {
-    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-    const [showNewPassword, setShowNewPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-
-    const [isSaving, setIsSaving] = useState(false);
-    const [securitySettings, setSecuritySettings] = useState({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-    });
-    const [changePassword] = useChangePasswordMutation();
-
-    const handleUpdatePassword = async () => {
-        try {
-            setIsSaving(true);
-            const response = await changePassword({
-                currentPassword: securitySettings.currentPassword,
-                newPassword: securitySettings.newPassword,
-                confirmPassword: securitySettings.confirmPassword,
-            }).unwrap();
-            if (response?.success) {
-                toast.success(response?.message || "Password updated");
-                setSecuritySettings({
-                    currentPassword: "",
-                    newPassword: "",
-                    confirmPassword: "",
-                });
-                setIsSaving(false);
-            }
-        } catch (error: any) {
-            toast.error(error?.data?.message);
-            setIsSaving(false);
-        }
-    };
 
     return (
         <div className="p-5">
@@ -104,121 +64,7 @@ export default function Setting() {
                 </TabsContent>
 
                 <TabsContent value="security">
-                    <Card className="border-none shadow-sm w-full max-w-6xl mx-auto">
-                        <CardContent className="px-8 pb-8">
-                            <div className="space-y-6">
-                                <h2 className="text-2xl font-bold">Security Settings</h2>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="currentPassword">Current Password</Label>
-                                    <div className="relative">
-                                        <Input
-                                            id="currentPassword"
-                                            type={showCurrentPassword ? "text" : "password"}
-                                            value={securitySettings.currentPassword}
-                                            onChange={(e) =>
-                                                setSecuritySettings({
-                                                    ...securitySettings,
-                                                    currentPassword: e.target.value,
-                                                })
-                                            }
-                                            className="h-12 pr-12"
-                                            placeholder="Enter current password"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                        >
-                                            {showCurrentPassword ? (
-                                                <EyeOff className="h-5 w-5" />
-                                            ) : (
-                                                <Eye className="h-5 w-5" />
-                                            )}
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="newPassword">New Password</Label>
-                                    <div className="relative">
-                                        <Input
-                                            id="newPassword"
-                                            type={showNewPassword ? "text" : "password"}
-                                            value={securitySettings.newPassword}
-                                            onChange={(e) =>
-                                                setSecuritySettings({
-                                                    ...securitySettings,
-                                                    newPassword: e.target.value,
-                                                })
-                                            }
-                                            className="h-12 pr-12"
-                                            placeholder="Enter current password"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowNewPassword(!showNewPassword)}
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                        >
-                                            {showNewPassword ? (
-                                                <EyeOff className="h-5 w-5" />
-                                            ) : (
-                                                <Eye className="h-5 w-5" />
-                                            )}
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                                   <div className="relative">
-                                        <Input
-                                            id="confirmPassword"
-                                            type={showConfirmPassword ? "text" : "password"}
-                                            value={securitySettings.confirmPassword}
-                                            onChange={(e) =>
-                                                setSecuritySettings({
-                                                    ...securitySettings,
-                                                    confirmPassword: e.target.value,
-                                                })
-                                            }
-                                            className="h-12 pr-12"
-                                            placeholder="Confirm new password"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                        >
-                                            {showConfirmPassword ? (
-                                                <EyeOff className="h-5 w-5" />
-                                            ) : (
-                                                <Eye className="h-5 w-5" />
-                                            )}
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <Button
-                                    onClick={handleUpdatePassword}
-                                    disabled={isSaving}
-                                    className="bg-red-600 hover:bg-red-700 text-white"
-                                >
-                                    {isSaving ? (
-                                        <>
-                                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                            Updating...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Save className="h-4 w-4 mr-2" />
-                                            Update
-                                        </>
-                                    )}
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <ChangePassword />
                 </TabsContent>
 
                 <TabsContent value="terms">

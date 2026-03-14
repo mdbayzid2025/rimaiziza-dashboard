@@ -102,9 +102,6 @@ const OTPVerifyPage = () => {
             const email = Cookies.get("email");
             // Fixed: removed otp from resend request
             const res = await resendOtp({ email }).unwrap();
-
-            console.log("resend res", res);
-
             if (res?.success) {
                 toast.success(res.message);
 
@@ -120,9 +117,6 @@ const OTPVerifyPage = () => {
             toast.error(error?.data?.message);
         }
     };
-
-    console.log("secondsLeft", secondsLeft);
-
 
     return (
         <div className="flex flex-col w-screen items-center justify-center min-h-screen bg-gray-100 p-4">

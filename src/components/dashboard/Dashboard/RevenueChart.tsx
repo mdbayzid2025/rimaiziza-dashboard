@@ -1,12 +1,11 @@
 import {
     CartesianGrid,
-    Legend,
     Line,
     LineChart,
     ResponsiveContainer,
     Tooltip,
     XAxis,
-    YAxis,
+    YAxis
 } from "recharts";
 
 import { colors, getGridColor } from "../../../lib/chart-config";
@@ -18,8 +17,8 @@ import {
     SelectValue,
 } from "../../ui/select";
 
-import { useGetRevenueGrowthQuery } from "../../../redux/features/dashboard/dashboardApi";
 import { useState } from "react";
+import { useGetRevenueGrowthQuery } from "../../../redux/features/dashboard/dashboardApi";
 
 interface SalesChartProps {
     mode?: "light" | "dark";
@@ -34,9 +33,7 @@ const monthNames = [
 
 export function RevenueChart({ mode = "light" }: SalesChartProps) {
     const [selectedYear, setSelectedYear] = useState(currentYear.toString());
-    const { data: revenueChart, isLoading } = useGetRevenueGrowthQuery(selectedYear);
-
-    console.log(selectedYear);
+    const { data: revenueChart } = useGetRevenueGrowthQuery(selectedYear);    
     const gridColor = getGridColor(mode);
 
     // 🔹 Transform API data
