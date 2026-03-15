@@ -16,8 +16,8 @@ const settingApi = baseApi.injectEndpoints({
       invalidatesTags: ["faqs"]
     }),
     updateFAQ: builder.mutation({
-      query: ({ id, data }) => ({
-        url: `/faqs/${id}`,
+      query: (data) => ({
+        url: `/faqs/${data.id}`,
         method: "PATCH",
         body: data,
       }),

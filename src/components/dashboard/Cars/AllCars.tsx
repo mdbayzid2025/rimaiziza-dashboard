@@ -109,7 +109,7 @@ export default function AllCars() {
                   className="pl-9 bg-background"
                 />
               </div>
-              <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+              <Dialog open={isModalOpen} onOpenChange={(open) => {setIsModalOpen(open); setSelectedCar(null)}}>
                 <DialogTrigger asChild>
                   <Button className="bg-indigo-600 hover:bg-indigo-700 border-0">
                     <UserPlus className="w-4 h-4 mr-2" />
@@ -125,7 +125,7 @@ export default function AllCars() {
                   <div className="mt-4">
                     <AddCarForm
                       open={isModalOpen}
-                      onCancel={() => setIsModalOpen(false)}
+                      onCancel={() => {setIsModalOpen(false); setSelectedCar(null)}}
                       data={selectedCar}
                     />
                   </div>

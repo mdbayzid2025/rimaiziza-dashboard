@@ -209,13 +209,25 @@ export default function AddCarForm({ onCancel, data, open }: AddCarFormProps) {
       }
 
       if (response?.success) {
-        toast.success(response?.message);        
+        toast.success(response?.message);
         onCancel?.();
       }
     } catch (error: any) {
       toast.error(error?.data?.message || "Something went wrong");
     }
   };
+
+  const handleCancel = () => {
+    setFields(defaultFields);
+    setSelectedFacilities([]);
+    setSelectedDays([]);
+    setSelectedHours([]);
+    setImage(null);
+    setImages([]);
+    setExistCover("");
+    setExistImages([]);
+    onCancel?.();
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -342,9 +354,9 @@ export default function AddCarForm({ onCancel, data, open }: AddCarFormProps) {
         <h3 className="text-sm font-semibold text-gray-800 uppercase mb-4">Pricing Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
-            { id: "dailyPrice", placeholder: "2500", label: "Daily Price (BDT)" },
-            { id: "hourlyPrice", placeholder: "300", label: "Hourly Price (BDT)" },
-            { id: "depositAmount", placeholder: "100", label: "Deposit Amount (BDT)" },
+            { id: "dailyPrice", placeholder: "2500", label: "Daily Price (RM)" },
+            { id: "hourlyPrice", placeholder: "300", label: "Hourly Price (RM)" },
+            { id: "depositAmount", placeholder: "100", label: "Deposit Amount (RM)" },
             { id: "minimumTripDuration", placeholder: "2", label: "Minimum Trip Duration (hours)", step: "0.5" },
           ].map(({ id, placeholder, label, step = "0.01" }) => (
             <div key={id} className="space-y-2">
@@ -566,7 +578,7 @@ export default function AddCarForm({ onCancel, data, open }: AddCarFormProps) {
           variant="secondary"
           size="lg"
           className="text-gray-700 bg-transparent border-2! border-gray-200! hover:bg-gray-50"
-          onClick={onCancel}
+          onClick={() => handleCancel()}
         >
           Cancel
         </Button>

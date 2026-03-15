@@ -29,7 +29,7 @@ useEffect(() => {
         className='transition-all duration-300 lg:ml-70 w-[calc(100vw-300px)]!'
       >
         <Navbar />
-        <main className="mb-0 w-[calc(100vw-300px)]  min-h-[calc(100vh-4rem)] px-0!">
+        <main className="mb-0 w-[calc(100vw-300px)]  min-h-[calc(100vh-4rem)] px-0!">        
           <Outlet />
         </main>
       </div>

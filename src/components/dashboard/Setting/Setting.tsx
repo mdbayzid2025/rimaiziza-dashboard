@@ -7,11 +7,13 @@ import PersonnalInformation from "./PersonnalInformation";
 import PrivacyPolicy from "./PrivacyPolicy";
 import TermsCondition from "./TermsCondition";
 import ChangePassword from "./ChangePassword";
+import FAQ from "./FAQ";
 
 const TABS = [
     { value: "general", label: "Information", icon: Globe, animate: "fade-up-right", delay: 100 },
     { value: "pricing", label: "Commission", icon: DollarSign, animate: "fade-up-right", delay: 200 },
     { value: "security", label: "Security", icon: Shield, animate: "fade-up-right", delay: 300 },
+    { value: "faq", label: "FAQ", icon: FileText, animate: "fade-up-right", delay: 400 },
     { value: "about", label: "About Us", icon: FileText, animate: "fade-up-right", delay: 400 },
     { value: "terms", label: "Terms", icon: FileText, animate: "fade-up-right", delay: 500 },
     { value: "privacy", label: "Privacy Policy", icon: FileText, animate: "fade-up-right", delay: 600 },
@@ -30,7 +32,7 @@ export default function Setting() {
                             Manage application settings and administrative preferences.
                         </p>
                     </div>
-                    <TabsList className="grid w-full h-16! bg-primary/20 grid-cols-6 gap-5 p-2 mt-5">
+                    <TabsList className="grid w-full h-16! bg-primary/20 grid-cols-7 gap-3 p-2 mt-5">
                         {TABS.map(({ value, label, icon: Icon, animate, delay }) => (
                             <TabsTrigger
                                 key={value}
@@ -47,7 +49,7 @@ export default function Setting() {
                                 transition-all"
                                 value={value}
                             >
-                                <Icon className="h-4 w-4 mr-2" />
+                                <Icon className="h-4 w-4 " />
                                 {label}
                             </TabsTrigger>
                         ))}
@@ -69,6 +71,9 @@ export default function Setting() {
 
                 <TabsContent value="terms">
                     <TermsCondition />
+                </TabsContent>
+                <TabsContent value="faq">
+                    <FAQ />
                 </TabsContent>
                 <TabsContent value="about">
                     <AboutUs />
