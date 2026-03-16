@@ -6,7 +6,7 @@ export const baseApi = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
 
-    baseUrl: "http://https://dashboard.gogreenmatrix.my/api/v1",   
+    baseUrl: "http://https://api.gogreenmatrix.my/api/v1",   
     // baseUrl: "https://moshfiqur5007.binarybards.online/api/v1",   
     prepareHeaders: (headers) => {      
       const token = Cookies.get("accessToken");
@@ -22,5 +22,5 @@ export const baseApi = createApi({
   tagTypes: ["user", "notifications", "admin", "category", "slider", "faqs", "withdrawal", "planner", "cars", "host", "booking", "profile", "rules", "commission"],
 });
 
-export const imageUrl = "https://dashboard.gogreenmatrix.my";
+export const imageUrl = "https://api.gogreenmatrix.my";
 // export const imageUrl = "https://moshfiqur5007.binarybards.online";
