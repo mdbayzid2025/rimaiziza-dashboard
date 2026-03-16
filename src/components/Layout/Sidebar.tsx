@@ -10,6 +10,7 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from "../ui/tooltip";
+import { useGetProfileQuery } from "../../redux/features/user/userApi";
 
 // ───────────────── Children ───────────────────────────────
 // Types
@@ -24,8 +25,10 @@ import {
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-
   const isActive = (path: string) => location.pathname === path;
+  const {data: profileData} = useGetProfileQuery({})
+
+  const filteredSidebarItems = sidebarItems?.filter((item)=> profileData?.role !== "ADMIN" ? true : item?.public)
 
   const handleLogout = () => {
     Cookies.remove("accessToken");    
@@ -60,7 +63,7 @@ export default function Sidebar() {
         {/* Main Navigation */}
         <ScrollArea className=" h-full px-3 py-4 mb-auto">
           <nav className="space-y-2!">
-            {sidebarItems.map((item, index) => {
+            {filteredSidebarItems?.map((item, index) => {
               const itemPath = `/${item.path}`;
               const isItemActive = isActive(itemPath);
               // ────────────────────────────────────────────────

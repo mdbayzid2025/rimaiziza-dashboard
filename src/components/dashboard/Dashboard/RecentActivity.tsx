@@ -25,20 +25,35 @@ const getTypeConfig = (type: string) => {
     }
 };
 
-const getDetails = (refModel: any, activity: any)=>{
-    switch (refModel?.toLowerCase()) {
-        case 'car':
-            return `${activity.referenceId?.pickupPoint?.address}`;
-        case 'booking':
-            return `${activity.referenceId?.pickupPoint?.address}`;
-        case 'review':
-            return `${activity.referenceId?.pickupPoint?.address}`;       
-        case 'user':
-            return `${activity.referenceId?.pickupPoint?.address}`;        
-        default:
-            return `${activity.referenceId?.pickupPoint?.address}`;
-    }
-}
+const getDetails = (refModel: any, activity: any) => {
+  switch (refModel?.toLowerCase()) {
+    case "car":
+      return <>{activity.referenceId?.pickupPoint?.address}</>;
+
+    case "booking":
+      return (
+        <>
+          Date:{" "} 
+          <span className='text-primary font-semibold uppercase'>
+          {new Date(activity.referenceId?.createdAt).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })}
+          </span>          
+        </>
+      );
+
+    case "review":
+      return <>{activity.referenceId?.pickupPoint?.address}</>;
+
+    case "user":
+      return <>{activity.referenceId?.pickupPoint?.address}</>;
+
+    default:
+      return <>{activity.referenceId?.pickupPoint?.address}</>;
+  }
+};
 
 const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
@@ -59,6 +74,8 @@ const RecentActivity = () => {
     const { data: profileData } = useGetProfileQuery({});
     const activities = data?.data ?? [];
 
+    console.log("activities", activities);
+    
       const socket = useSocket()
     
       useEffect(() => {

@@ -9,6 +9,7 @@ export const sidebarItems = [
     label: "Overview",
     path: "",
     icon: <RxDashboard size={20} />,
+    public: true
   },
 
   {
@@ -16,36 +17,42 @@ export const sidebarItems = [
     label: "Cars Manage",
     path: "cars",
     icon: <Car size={20} />,
+    public: true
   },
   {
     key: "hosts",
     label: "Hosts Manage",
     path: "hosts",
     icon: <UserCheck size={20} />,
+    public: true
   },
   {
     key: "bookings",
     label: "Bookings Manage",
     path: "bookings",
     icon: <Calendar size={20} />,
+    public: true
   },
   {
     key: "users",
     label: "Users Manage",
     path: "users",
     icon: <FaRegCircleUser size={20} />,
+    public: true
   },
   {
     key: "admins",
     label: "Admin Manage",
     path: "admins",
     icon: <UserStar size={20} />,
+    public: false
   },
   {
     key: "setting",
     label: "Setting",
     path: "setting",
     icon: <IoSettingsOutline size={20} />,
+    public: true
   },
   // {
   //   key: "cms",

@@ -1,13 +1,13 @@
 import Cookies from "js-cookie"
+import { Eye, EyeOff } from "lucide-react"
 import { useEffect, useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
+import { toast } from "sonner"
+import { useLoginAdminMutation } from "../../redux/features/auth/authApi"
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
-import { useLoginAdminMutation } from "../../redux/features/auth/authApi"
-import { toast } from "sonner"
-import { Eye, EyeOff } from "lucide-react"
 
 
 
@@ -17,7 +17,6 @@ export default function Login() {
     const [acceptTerms, setAcceptTerms] = useState(false)
     const [viewPassword, setViewPassword] = useState(false)
     const [login] = useLoginAdminMutation()
-    const navigate = useNavigate()
 
     useEffect(() => {
         const email = Cookies.get("email");
@@ -43,7 +42,8 @@ export default function Login() {
             if (response?.success) {
                 toast.success(response?.message);
                 Cookies.set("accessToken", response?.data?.token);
-                navigate("/")
+                Cookies.set("role", response?.data?.user?.role);
+                window.location.replace("/")
             }
         } catch (error: any) {
             toast.error(error?.data?.message);
