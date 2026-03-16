@@ -6,7 +6,7 @@ export const baseApi = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
 
-    baseUrl: "http://https://api.gogreenmatrix.my/api/v1",   
+    baseUrl: "https://api.gogreenmatrix.my/api/v1",   
     // baseUrl: "https://moshfiqur5007.binarybards.online/api/v1",   
     prepareHeaders: (headers) => {      
       const token = Cookies.get("accessToken");
