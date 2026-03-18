@@ -7,7 +7,7 @@ export const baseApi = createApi({
   baseQuery: fetchBaseQuery({
 
     baseUrl: "https://api.gogreenmatrix.my/api/v1",   
-    // baseUrl: "https://moshfiqur5007.binarybards.online/api/v1",   
+    // baseUrl: "http://10.10.7.41:5005/api/v1",   
     prepareHeaders: (headers) => {      
       const token = Cookies.get("accessToken");
       if (token) {
@@ -23,4 +23,4 @@ export const baseApi = createApi({
 });
 
 export const imageUrl = "https://api.gogreenmatrix.my";
-// export const imageUrl = "https://moshfiqur5007.binarybards.online";
+// export const imageUrl = "http://10.10.7.41:5005";

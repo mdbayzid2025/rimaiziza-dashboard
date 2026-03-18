@@ -1,8 +1,7 @@
 // pages/hosts/HostsPage.tsx
 import {
     Calendar,
-    Car,
-    Copy,
+    Car,    
     Eye,
     Loader,
     Lock,
@@ -240,20 +239,7 @@ export default function Hosts() {
                                         <div className="space-y-1">
                                             <div className="flex items-center gap-2">
                                                 <Mail className="h-4 w-4 text-muted-foreground" />
-                                                <span>{host.email}</span>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-6 w-6"
-                                                    onClick={() => navigator.clipboard.writeText(host.email)}
-                                                >
-                                                    <Copy className="h-3.5 w-3.5" />
-                                                </Button>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <Lock className="h-4 w-4 text-muted-foreground" />
-                                                {/* Password hash should never be shown — display placeholder */}
-                                                <span>{"•••••••••"}</span>
+                                                <span>{host.email}</span>                                            
                                             </div>
                                         </div>
                                     </TableCell>

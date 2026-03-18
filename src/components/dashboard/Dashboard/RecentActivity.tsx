@@ -73,9 +73,6 @@ const RecentActivity = () => {
     const { data, isLoading, refetch } = useGetRecentActivitiesQuery({});
     const { data: profileData } = useGetProfileQuery({});
     const activities = data?.data ?? [];
-
-    console.log("activities", activities);
-    
       const socket = useSocket()
     
       useEffect(() => {
@@ -138,8 +135,7 @@ const RecentActivity = () => {
                                                         <div className="font-medium text-gray-900 text-sm leading-5 mb-1">
                                                             {activity.text}
                                                         </div>
-                                                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                                                            <MapPin className="w-3 h-3 flex-shrink-0" />
+                                                        <div className="flex items-center gap-2 text-xs text-gray-500">                                                            
                                                             <span className="truncate">{detail}</span>
                                                         </div>
                                                     </div>

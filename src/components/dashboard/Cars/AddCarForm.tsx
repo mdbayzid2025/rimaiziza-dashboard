@@ -410,7 +410,7 @@ export default function AddCarForm({ onCancel, data, open }: AddCarFormProps) {
                   <SelectItem key={host._id} value={host._id}>
                     <div className="flex items-center gap-2">
                       <img
-                        src={imageUrl + host.profileImage}
+                        src={host.profileImage ? imageUrl + host.profileImage : "/placeholder.png"}
                         alt={host.name}
                         className="w-6 h-6 rounded-full object-cover"
                       />

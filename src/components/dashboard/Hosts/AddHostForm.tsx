@@ -83,12 +83,16 @@ export default function AddHostForm({ onCancel, data, open }: AddHostFormProps) 
         response = await createHost(payload)?.unwrap();
       }
 
+      console.log("response", response);
+      
       if (response?.success) {
         toast.success(response?.message);
         onCancel?.();
       }
     } catch (error: any) {
-      toast.error(error?.data?.message || "Something went wrong");
+      console.log("error", error);
+      
+      toast.error(error?.data?.errorMessages[0]?.message);
     }
   };
 
@@ -140,6 +144,7 @@ export default function AddHostForm({ onCancel, data, open }: AddHostFormProps) 
               <Input
                 id="password"
                 name="password"
+                minLength={8}
                 type={showPassword ? "text" : "password"}
                 placeholder={isEditMode ? "Enter new password" : "Enter password"}
                 value={fields.password}

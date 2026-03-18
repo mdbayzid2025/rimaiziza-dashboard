@@ -26,12 +26,12 @@ export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const isActive = (path: string) => location.pathname === path;
-  const {data: profileData} = useGetProfileQuery({})
+  const { data: profileData } = useGetProfileQuery({})
 
-  const filteredSidebarItems = sidebarItems?.filter((item)=> profileData?.role !== "ADMIN" ? true : item?.public)
+  const filteredSidebarItems = sidebarItems?.filter((item) => profileData?.role !== "ADMIN" ? true : item?.public)
 
   const handleLogout = () => {
-    Cookies.remove("accessToken");    
+    Cookies.remove("accessToken");
     navigate("/login");
   };
 
@@ -42,22 +42,11 @@ export default function Sidebar() {
     >
       <div className="h-screen flex flex-col">
         {/* Header / Logo + Toggle */}
-        <div className="flex h-16 items-center justify-between border-b border-neutral-200 px-4">
-
-          <div className="flex items-center gap-2">
-            {/* Replace with your logo */}
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-white">
-              TL
-            </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-semibold text-neutral-900">
-                TradeLink
-              </span>
-              <span className="text-xs text-neutral-500">
-                Network
-              </span>
-            </div>
-          </div>
+        <div className="flex flex-col py-3 items-center justify-between border-b border-neutral-200 px-4">
+          <img className="w-48 mx-auto" src="/logo.png" alt="" />
+          <span className="text-lg font-semibold text-neutral-900">
+            Admin
+          </span>
         </div>
 
         {/* Main Navigation */}

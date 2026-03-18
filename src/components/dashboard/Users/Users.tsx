@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 
 import Swal from "sweetalert2";
 import { imageUrl } from "../../../redux/base/baseAPI";
-import { useGetUsersQuery, useUpdateUserMutation } from "../../../redux/features/user/userApi";
+import { useDeleteUserMutation, useGetUsersQuery, useUpdateUserMutation } from "../../../redux/features/user/userApi";
 import { getSearchParams } from "../../../utils/getSearchParams";
 import { useUpdateSearchParams } from "../../../utils/updateSearchParams";
 import ManagePagination from "../../Shared/ManagePagination";
@@ -18,6 +18,8 @@ export default function Users() {
 
     const { data: userData, isLoading, refetch } = useGetUsersQuery({});
     const [updateUserStatus] = useUpdateUserMutation();
+    const [deleteUser] = useDeleteUserMutation()
+
     const [searchInput, setSearchInput] = useState("");
     const users = userData?.data || [];
     const { searchTerm, page } = getSearchParams();
@@ -32,6 +34,55 @@ export default function Users() {
             setSearchInput(searchTerm);
         }
     }, []);
+
+    const handleDelete = async (user: any) => {        
+    const hasBookings = user?.bookingCount;
+
+    if (hasBookings) {
+        const warningResult = await Swal.fire({
+            title: "⚠️ User Has Booking Records",
+            text: `This user has ${hasBookings} bookings. Deleting this user may affect existing records. Please proceed only if necessary.`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#6b7280",
+            confirmButtonText: "Yes, Delete Anyway",
+            cancelButtonText: "Cancel",
+        });
+
+        if (!warningResult.isConfirmed) return;
+    } else {
+        const result = await Swal.fire({
+            title: "Delete this user?",
+            text: "This action cannot be undone.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#6b7280",
+            confirmButtonText: "Yes, Delete User",
+        });
+
+        if (!result.isConfirmed) return;
+    }
+
+    try {
+        await deleteUser(user._id).unwrap();
+
+        Swal.fire({
+            icon: "success",
+            title: "User Deleted",
+            timer: 1500,
+            showConfirmButton: false,
+        });
+
+    } catch (error) {
+        Swal.fire({
+            icon: "error",
+            title: "Something went wrong",
+            text: "Failed to delete user",
+        });
+    }
+};
 
     const formatDate = (date: string) => {
         return new Date(date).toLocaleDateString();
@@ -211,7 +262,7 @@ export default function Users() {
                                                     <Unlock className="w-4 h-4 cursor-pointer hover:scale-110 transition-transform" />
                                                 )}
                                             </Button>
-                                            <Button variant="outline">
+                                            <Button    onClick={() => handleDelete(user)} variant="outline">
                                                 <Trash2 className="w-4 h-4 cursor-pointer hover:scale-110 transition-transform text-red-600" />
                                             </Button>
                                         </div>

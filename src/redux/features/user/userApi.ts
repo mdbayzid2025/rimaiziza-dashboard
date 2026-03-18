@@ -23,7 +23,8 @@ const userApi = baseApi.injectEndpoints({
           url: `/users/${id}`,
           method: "DELETE"
         }
-      }
+      },
+      invalidatesTags: ["user"]
     }),
 
     getSingleUser: build.query({

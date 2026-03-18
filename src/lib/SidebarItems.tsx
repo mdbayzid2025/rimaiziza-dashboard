@@ -14,42 +14,42 @@ export const sidebarItems = [
 
   {
     key: "cars",
-    label: "Cars Manage",
+    label: "Fleet",
     path: "cars",
     icon: <Car size={20} />,
     public: true
   },
   {
     key: "hosts",
-    label: "Hosts Manage",
+    label: "Host",
     path: "hosts",
     icon: <UserCheck size={20} />,
     public: true
   },
   {
     key: "bookings",
-    label: "Bookings Manage",
+    label: "Booking",
     path: "bookings",
     icon: <Calendar size={20} />,
     public: true
   },
   {
     key: "users",
-    label: "Users Manage",
+    label: "User",
     path: "users",
     icon: <FaRegCircleUser size={20} />,
     public: true
   },
   {
     key: "admins",
-    label: "Admin Manage",
+    label: "Admin",
     path: "admins",
     icon: <UserStar size={20} />,
     public: false
   },
   {
     key: "setting",
-    label: "Setting",
+    label: "Settings",
     path: "setting",
     icon: <IoSettingsOutline size={20} />,
     public: true
